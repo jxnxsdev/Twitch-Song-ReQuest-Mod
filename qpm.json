@@ -2,18 +2,18 @@
   "sharedDir": "shared",
   "dependenciesDir": "extern",
   "info": {
-    "name": "Twitch Song Request",
-    "id": "twitch_song_request",
+    "name": "TwitchSongRequest",
+    "id": "TwitchSongRequest",
     "version": "0.1.0",
     "url": null,
     "additionalData": {
-      "overrideSoName": "libtwitch_song_request.so"
+      "overrideSoName": "libTwitchSongRequest.so"
     }
   },
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^3.14.0",
+      "versionRange": "^3.8.0",
       "additionalData": {
         "extraFiles": [
           "src/inline-hook"
@@ -26,33 +26,28 @@
       "additionalData": {}
     },
     {
-      "id": "bsml",
-      "versionRange": "^0.3.0",
-      "additionalData": {}
-    },
-    {
-      "id": "questui",
-      "versionRange": "^0.17.10",
-      "additionalData": {}
-    },
-    {
-      "id": "config-utils",
-      "versionRange": "^0.8.0",
-      "additionalData": {}
-    },
-    {
-      "id": "custom-types",
-      "versionRange": "^0.15.22",
-      "additionalData": {}
-    },
-    {
       "id": "codegen",
       "versionRange": "^0.33.0",
       "additionalData": {}
     },
     {
-      "id": "songdownloader",
-      "versionRange": "^0.5.6",
+      "id": "questui",
+      "versionRange": "^0.17.11",
+      "additionalData": {}
+    },
+    {
+      "id": "custom-types",
+      "versionRange": "^0.15.23",
+      "additionalData": {}
+    },
+    {
+      "id": "config-utils",
+      "versionRange": "^1.0.2",
+      "additionalData": {}
+    },
+    {
+      "id": "bsml",
+      "versionRange": "^0.3.1",
       "additionalData": {}
     }
   ],

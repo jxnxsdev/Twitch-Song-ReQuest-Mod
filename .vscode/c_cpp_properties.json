@@ -2,7 +2,7 @@
   "configurations": [
     {
       "defines": [
-        "MOD_ID=\"twitch_song_request\"",
+        "MOD_ID=\"TwitchSongRequest\"",
         "VERSION=\"0.1.0\"",
         "__GNUC__",
         "__aarch64__"
@@ -15,7 +15,7 @@
         "${workspaceFolder}/shared", 
         "${workspaceFolder}",
         
-        "G:/android-ndk-r25c/**",
+        "G:\android-ndk-r25c/**",
         "${default}"
       ],
       "name": "Quest",

@@ -1,6 +1,6 @@
-# Twitch Song Request
+# TwitchSongRequest
 
-Let your viewers suggest beatmaps using the !bsr command
+TwitchSongRequest
 
 Use `qpm-rust s build` to build
 Same goes for `qpm-rust s copy` and `qpm-rust s qmod`

@@ -1,17 +1,7 @@
 #include "main.hpp"
-#include "easywsclient.hpp"
-#ifdef _WIN32
-#pragma comment( lib, "ws2_32" )
-#include <WinSock2.h>
-#endif
-#include <assert.h>
-#include <stdio.h>
-#include <string>
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
-
 int connectionStatus = 2; // 0 = not connected, 1 = connected, 2 = not checked
-
 
 // Loads the config from disk using our modInfo, then returns it for use
 // other config tools such as config-utils don't use this config, so it can be removed if those are in use
@@ -40,19 +30,18 @@ void DidActivate(HMUI::ViewController* self, bool firstActivation, bool addedToH
     else {
         // check if the server is connected
         if (connectionStatus == 2) {
-            // check if the server is connected
-            // if not, display a button to connect
-            // if yes, display a button to disconnect
+            QuestUI::BeatSaberUI::CreateText(self->get_transform(), "Checking if server is connected...", true, UnityEngine::Vector2(0, 0));
         }
         else if (connectionStatus == 1) {
-            // display a button to disconnect
+            QuestUI::BeatSaberUI::CreateText(self->get_transform(), "Server is connected.", true, UnityEngine::Vector2(0, 0));
         }
         else if (connectionStatus == 0) {
-            // display a button to connect
+            QuestUI::BeatSaberUI::CreateText(self->get_transform(), "Server is not connected.", true, UnityEngine::Vector2(0, 0));
         }
     }
 }
 
+// websocket stuff
 using easywsclient::WebSocket;
 static WebSocket::pointer ws = NULL;
 
@@ -63,35 +52,20 @@ void handle_message(const std::string & message){
     getLogger().info("%s", logMessage);
 }
 
-int webSocketConnect() {
+int ConnectWebSocket() {
     std::string webSocketUrl = "ws://" + getModConfig().ServerAddress.GetValue() + ":" + getModConfig().ServerPort.GetValue();
-
-    #ifdef _WIN32
-        INT rc;
-        WSADATA wsaData;
-
-        rc = WSAStartup(MAKEWORD(2, 2), &wsaData);
-        if (rc) {
-            printf("WSAStartup Failed.\n");
-            return 1;
-        }
-    #endif
-
-    ws = WebSocket::from_url(webSocketUrl.c_str());
+    getLogger().info("Connecting to %s", webSocketUrl.c_str());
+    ws = WebSocket::from_url(webSocketUrl);
     assert(ws);
-    getLogger().info("WebSocket is connected!");
-    ws->send("hello");
+    ws->send("Hello, world!");
+    connectionStatus = 1;
 
     while (ws->getReadyState() != WebSocket::CLOSED) {
         ws->poll();
         ws->dispatch(handle_message);
     }
 
-    delete ws;
-    #ifdef _WIN32
-        WSACleanup();
-    #endif
-    return 0;
+    connectionStatus = 0;
 }
 
 // Called at the early stages of game loading
@@ -113,9 +87,10 @@ extern "C" void load() {
     QuestUI::Register::RegisterModSettingsViewController(modInfo, DidActivate);
 
     getLogger().info("Installing hooks...");
+    // Install our hooks (none defined yet)
     getLogger().info("Installed all hooks!");
 
-    // run a thread to connect to the websocket server and detach it
-    std::thread webSocketThread(webSocketConnect);
-    webSocketThread.detach();
+    // start the websocket connection
+    std::thread t1(ConnectWebSocket);
+    t1.detach();
 }

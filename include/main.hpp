@@ -10,7 +10,6 @@
 #include "beatsaber-hook/shared/utils/il2cpp-functions.hpp"
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 
-// Includes for the functionality of the mod
 #include "HMUI/CurvedTextMeshPro.hpp"
 #include "HMUI/ViewController.hpp"
 #include "config-utils/shared/config-utils.hpp"
@@ -22,9 +21,8 @@
 #include "questui/shared/QuestUI.hpp"
 #include "TMPro/TextMeshProUGUI.hpp"
 
-// Configs and Implementation
 #include "config.hpp"
-
+#include "easywsclient.hpp"
 
 // Define these functions here so that we can easily read configuration and log information from other files
 Configuration& getConfig();
