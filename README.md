@@ -1,6 +1,6 @@
 # TwitchSongReQuest
 
-This mod requires the [TwitchSongReQuestClient](https://github.com/hdgamer1404Jonas/Twitch-Song-Request-Client)
+This mod requires the [TwitchSongReQuestClient](https://github.com/hdgamer1404Jonas/Twitch-Song-Request-Client),
 Setup Instructions can be found in the Repo's README.md
 
 ## Credits
