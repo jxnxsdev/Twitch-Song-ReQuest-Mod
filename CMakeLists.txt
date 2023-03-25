@@ -42,7 +42,7 @@ add_library(
         SHARED
         ${cpp_file_list}
         ${c_file_list}
-        include/config.hpp include/easywsclient.hpp src/easywsclient.cpp)
+        include/config.hpp include/easywsclient.hpp src/easywsclient.cpp src/ModSettingVC.cpp include/ModSettingVC.hpp include/MapObject.hpp include/CT/Handler.hpp src/CT/Handler.cpp)
 
 target_include_directories(${COMPILE_ID} PRIVATE .)
 
