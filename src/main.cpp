@@ -1,5 +1,11 @@
 #include "main.hpp"
 
+using namespace QuestUI;
+using namespace UnityEngine;
+using namespace UnityEngine::UI;
+using namespace HMUI;
+using namespace TMPro;
+
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 int connectionStatus = 2; // 0 = not connected, 1 = connected, 2 = not checked
 
@@ -15,6 +21,33 @@ Logger& getLogger() {
     static Logger* logger = new Logger(modInfo);
     return *logger;
 }
+
+
+
+// Hooks
+UnityEngine::GameObject* container = nullptr;
+
+MAKE_HOOK_MATCH(MainMenuUIHook, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController
+        *self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    // Run the original method before our code.
+    // Note, you can run the original method after our code if you want to change arguments.
+    MainMenuUIHook(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+
+
+    if (firstActivation) {
+        container = QuestUI::BeatSaberUI::CreateScrollableSettingsContainer(self->get_transform());
+
+
+
+        QuestUI::BeatSaberUI::CreateText(container->get_transform(), "Welcome to Twitch Song Request!", true, UnityEngine::Vector2(0, 0));
+    }
+
+    if (container) {
+        container->get_gameObject()->SetActive(true);
+    }
+}
+
+
 
 void DidActivate(HMUI::ViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     if(firstActivation) {
@@ -87,7 +120,7 @@ extern "C" void load() {
     QuestUI::Register::RegisterModSettingsViewController(modInfo, DidActivate);
 
     getLogger().info("Installing hooks...");
-    // Install our hooks (none defined yet)
+    INSTALL_HOOK(getLogger(), MainMenuUIHook);
     getLogger().info("Installed all hooks!");
 
     // start the websocket connection
