@@ -41,13 +41,13 @@
       "additionalData": {}
     },
     {
-      "id": "config-utils",
-      "versionRange": "^1.0.2",
+      "id": "bsml",
+      "versionRange": "^0.3.1",
       "additionalData": {}
     },
     {
-      "id": "bsml",
-      "versionRange": "^0.3.1",
+      "id": "config-utils",
+      "versionRange": "^1.0.2",
       "additionalData": {}
     }
   ],

@@ -18,6 +18,16 @@ void TwitchSongRequest::Handler::Update() {
             rotation = getModConfig().Rotation.GetValue();
         }
 
+        if (Name != "MainMenu") {
+            if (Canvas) {
+                Canvas->set_active(false);
+            }
+        }else {
+            if (Canvas) {
+                Canvas->set_active(true);
+            }
+        }
+
         SetPosition(position);
         SetRotation(rotation);
 
