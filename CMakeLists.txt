@@ -45,6 +45,8 @@ add_library(
         SHARED
         ${cpp_file_list}
         ${c_file_list}
+        ${twitchirc_cpp_file_list}
+        ${twitchirc_c_file_list}
         include/ModConfig.hpp src/ModSettingsViewController.cpp include/ModSettingsViewController.hpp)
 
 target_include_directories(${COMPILE_ID} PRIVATE .)

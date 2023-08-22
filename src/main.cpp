@@ -58,6 +58,14 @@ extern "C" void setup(ModInfo& info) {
 void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
     std::string username = ircMessage.prefix.nick;
     std::string message = ircMessage.parameters.at(ircMessage.parameters.size() - 1);
+
+    // check if the message begins with "!bsr"
+    if(!message.starts_with("!bsr")) return;
+
+    // get the code after "!bsr"
+    std::string code = message.substr(5);
+
+    
 }
 
 #define JOIN_RETRY_DELAY 3000
