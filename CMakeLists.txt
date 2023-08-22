@@ -24,6 +24,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED 20)
 # define that stores the actual source directory
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(INCLUDE_TWITCHIRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/TwitchIRC)
 
 # compile options used
 add_compile_options(-frtti -fexceptions)
@@ -35,6 +36,8 @@ add_compile_definitions(MOD_ID=\"${MOD_ID}\")
 # recursively get all src files
 RECURSE_FILES(cpp_file_list ${SOURCE_DIR}/*.cpp)
 RECURSE_FILES(c_file_list ${SOURCE_DIR}/*.c)
+RECURSE_FILES(twitchirc_cpp_file_list ${INCLUDE_TWITCHIRC_DIR}/*.cpp)
+RECURSE_FILES(twitchirc_c_file_list ${INCLUDE_TWITCHIRC_DIR}/*.c)
 
 # add all src files to compile
 add_library(
