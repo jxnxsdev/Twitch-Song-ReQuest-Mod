@@ -2,7 +2,7 @@
 include(qpm_defines.cmake)
 
 # override mod id
-set(MOD_ID "TwitchSongRequest")
+set(MOD_ID "TwitchSongReQuest")
 
 # Enable link time optimization
 # In my experience, this can be highly unstable but it nets a huge size optimization and likely performance
@@ -42,7 +42,7 @@ add_library(
         SHARED
         ${cpp_file_list}
         ${c_file_list}
-        include/config.hpp include/easywsclient.hpp src/easywsclient.cpp src/ModSettingVC.cpp include/ModSettingVC.hpp include/MapObject.hpp include/CT/Handler.hpp src/CT/Handler.cpp)
+)
 
 target_include_directories(${COMPILE_ID} PRIVATE .)
 
