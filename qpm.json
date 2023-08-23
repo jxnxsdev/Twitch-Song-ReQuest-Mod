@@ -55,6 +55,21 @@
       "id": "questui",
       "versionRange": "^0.17.12",
       "additionalData": {}
+    },
+    {
+      "id": "songdownloader",
+      "versionRange": "^0.6.0",
+      "additionalData": {}
+    },
+    {
+      "id": "song-details",
+      "versionRange": "^0.3.1",
+      "additionalData": {}
+    },
+    {
+      "id": "libcurl",
+      "versionRange": "^7.78.0",
+      "additionalData": {}
     }
   ],
   "workspace": {

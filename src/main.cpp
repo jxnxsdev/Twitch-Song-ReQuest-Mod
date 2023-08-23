@@ -16,6 +16,10 @@
 #include "UnityEngine/SceneManagement/Scene.hpp"
 #include "UnityEngine/SceneManagement/SceneManager.hpp"
 
+#include "libcurl/shared/curl.h"
+
+#include "song-details/shared/SongDetails.hpp"
+
 
 #include <map>
 #include <thread>
@@ -23,10 +27,12 @@
 #include <sstream>
 #include <chrono>
 
+
 bool threadRunning = false;
 
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
+static std::future<SongDetailsCache::SongDetails*> songDetails;
 
 // Loads the config from disk using our modInfo, then returns it for use
 // other config tools such as config-utils don't use this config, so it can be removed if those are in use
@@ -54,6 +60,7 @@ extern "C" void setup(ModInfo& info) {
     getLogger().info("Completed setup!");
 }
 
+#define BeatSaverAPILink "https://api.beatsaver.com/maps/id/"
 
 void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
     std::string username = ircMessage.prefix.nick;
@@ -62,10 +69,20 @@ void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
     // check if the message begins with "!bsr"
     if(!message.starts_with("!bsr")) return;
 
-    // get the code after "!bsr"
+    // check if there is a code after !bsr. The synctac is "!bsr <code>
+    if(message.length() < 6) return;
+
+    // get the code
     std::string code = message.substr(5);
 
-    
+    auto songdetails = songDetails.get();
+
+    if(songdetails->songs.FindByMapId(code).none) {
+        getLogger().info("Song not found!");
+    }else {
+        getLogger().info("Found song %s", songdetails->songs.FindByMapId(code).songName().c_str());
+    }
+
 }
 
 #define JOIN_RETRY_DELAY 3000
@@ -150,6 +167,8 @@ MAKE_HOOK_MATCH(SceneManager_Internal_ActiveSceneChanged,
 extern "C" void load() {
     il2cpp_functions::Init();
     QuestUI::Init();
+
+    songDetails = SongDetailsCache::SongDetails::Init();
 
     // Register settings menu
     QuestUI::Register::RegisterModSettingsViewController(modInfo, DidActivate);
