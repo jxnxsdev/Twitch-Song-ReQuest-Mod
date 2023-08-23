@@ -47,7 +47,7 @@ add_library(
         ${c_file_list}
         ${twitchirc_cpp_file_list}
         ${twitchirc_c_file_list}
-        include/ModConfig.hpp src/ModSettingsViewController.cpp include/ModSettingsViewController.hpp)
+        include/ModConfig.hpp src/ModSettingsViewController.cpp include/ModSettingsViewController.hpp src/Display.cpp include/Display.hpp include/MapObject.hpp)
 
 target_include_directories(${COMPILE_ID} PRIVATE .)
 

@@ -30,6 +30,5 @@ void DidActivate(ViewController* self, bool firstActivation, bool addedToHierarc
         layoutElement->set_minWidth(4.0f);
         AddConfigValueIncrementVector3(parent, getModConfig().PositionMenu, 2, 0.05f);
         AddConfigValueIncrementVector3(parent, getModConfig().RotationMenu, 0, 1.0f);
-        AddConfigValueIncrementVector2(parent, getModConfig().SizeMenu, 0, 1.0f);
     }
 }
