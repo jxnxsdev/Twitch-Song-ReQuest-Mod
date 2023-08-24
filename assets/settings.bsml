@@ -1,0 +1,13 @@
+<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xsi:noNamespaceSchemaLocation='https://raw.githubusercontent.com/RedBrumbler/Quest-BSML-Docs/gh-pages/schema.xsd'
+    anchor-pos-y='5'>
+    <vertical horizontal-fit="Unconstrained" vertical-fit="Unconstrained" spacing="-13">
+        <settings-container>
+            <text text="Please Configure the Settings below so TSRQ works with your channel" font-size="4" font-style="Bold" color="white" alignment="Center"/>
+            <vertical>
+                <text text="Channel Name" font-size="3" font-style="Bold" color="white" alignment="Center"/>
+                <input id="channelName" text="Channel Name" font-size="3" font-style="Bold" color="white" alignment="Center"/>
+            </vertical>
+        </settings-container>
+    </vertical>
+</bg>

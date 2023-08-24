@@ -2,7 +2,7 @@
 
 #include "ModConfig.hpp"
 #include "ModSettingsViewController.hpp"
-#include "Display.hpp"
+#include "Installers/MenuInstaller.hpp"
 
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
@@ -17,24 +17,12 @@
 #include "UnityEngine/SceneManagement/Scene.hpp"
 #include "UnityEngine/SceneManagement/SceneManager.hpp"
 
-#include "libcurl/shared/curl.h"
-
 #include "song-details/shared/SongDetails.hpp"
 
-#include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
-#include "HMUI/CurvedTextMeshPro.hpp"
-#include "HMUI/ViewController.hpp"
-#include "config-utils/shared/config-utils.hpp"
-#include "UnityEngine/UI/Button.hpp"
-#include "UnityEngine/Vector2.hpp"
-#include "UnityEngine/Component.hpp"
-#include "UnityEngine/GameObject.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "questui/shared/QuestUI.hpp"
-#include "TMPro/TextMeshProUGUI.hpp"
-#include "VRUIControls/VRGraphicRaycaster.hpp"
-#include "UnityEngine/UI/RectMask2D.hpp"
+#include "bsml/shared/BSML.hpp"
 
+#include "lapiz/shared/zenject/Zenjector.hpp"
+#include "lapiz/shared/AttributeRegistration.hpp"
 
 #include <map>
 #include <thread>
@@ -44,54 +32,7 @@
 
 
 bool threadRunning = false;
-TwitchSongRequest::Display* display = nullptr;
 
-void CreateUI() {
-    getLogger().info("Creating UI");
-
-    UnityEngine::GameObject* canvas = QuestUI::BeatSaberUI::CreateCanvas();
-    display = canvas->AddComponent<TwitchSongRequest::Display*>();
-    canvas->AddComponent<RectMask2D*>();
-    canvas->AddComponent<Backgroundable*>()->ApplyBackgroundWithAlpha("round-rect-panel", 0.75f);
-    RectTransform* transform = canvas->GetComponent<RectTransform*>();
-
-    // make it interactive
-    VRUIControls::VRGraphicRaycaster* raycaster = canvas->AddComponent<VRUIControls::VRGraphicRaycaster*>();
-
-    // create a scrollable container
-    UnityEngine::GameObject* layout = QuestUI::BeatSaberUI::CreateScrollableSettingsContainer(canvas->get_transform());
-
-    // add a text to the container
-    QuestUI::BeatSaberUI::CreateText(layout->get_transform(), "Twitch Song Requests");
-
-
-    VerticalLayoutGroup* verticalLayout = layout->GetComponent<VerticalLayoutGroup*>();
-    verticalLayout->set_childControlWidth(false);
-    verticalLayout->set_childControlHeight(true);
-    verticalLayout->set_childForceExpandWidth(true);
-    verticalLayout->set_childForceExpandHeight(false);
-    verticalLayout->set_childAlignment(TextAnchor::LowerLeft);
-    VRUIControls::VRGraphicRaycaster* layoutRaycaster = layout->AddComponent<VRUIControls::VRGraphicRaycaster*>();
-
-    GameObject* layoutGameObject = verticalLayout->get_gameObject();
-    RectTransform* layoutTransform = verticalLayout->get_rectTransform();
-    layoutTransform->set_pivot(UnityEngine::Vector2(0.0f, 0.0f));
-
-    display->LayoutTransform = layoutTransform;
-    display->Canvas = canvas;
-}
-
-void AddSongObject(std::string name, std::string artist, std::string id) {
-    MapObject mapObject = {};
-    mapObject.SongName = name;
-    mapObject.SongArtist = artist;
-    mapObject.SongID = id;
-    mapObject.GameObject = nullptr;
-
-    if(display) {
-        display->AddMapObject(mapObject);
-    }
-}
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 static std::future<SongDetailsCache::SongDetails*> songDetails;
@@ -122,7 +63,6 @@ extern "C" void setup(ModInfo& info) {
     getLogger().info("Completed setup!");
 }
 
-#define BeatSaverAPILink "https://api.beatsaver.com/maps/id/"
 
 void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
     std::string username = ircMessage.prefix.nick;
@@ -140,13 +80,6 @@ void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
     auto songdetails = songDetails.get();
     auto& song = songdetails->songs.FindByMapId(code);
 
-    if(!song) {
-        getLogger().info("Song not found!");
-        return;
-    }else {
-        getLogger().info("Found song %s", songdetails->songs.FindByMapId(code).songName().c_str());
-        AddSongObject(song.songName(), song.songAuthorName(), code);
-    }
 
 }
 
@@ -222,7 +155,6 @@ MAKE_HOOK_MATCH(SceneManager_Internal_ActiveSceneChanged,
                             std::thread (TwitchIRCThread).detach();
                     }
             );
-            if(!display) CreateUI();
         }
     }
 }
@@ -233,6 +165,9 @@ MAKE_HOOK_MATCH(SceneManager_Internal_ActiveSceneChanged,
 extern "C" void load() {
     il2cpp_functions::Init();
     QuestUI::Init();
+    ::BSML::Init();
+    ::custom_types::Register::AutoRegister();
+    ::Lapiz::Attributes::AutoRegister();
 
     songDetails = SongDetailsCache::SongDetails::Init();
 
@@ -243,4 +178,7 @@ extern "C" void load() {
     getLogger().info("Installing hooks...");
     INSTALL_HOOK(getLogger(), SceneManager_Internal_ActiveSceneChanged);
     getLogger().info("Installed all hooks!");
+
+    auto zenjector = ::Lapiz::Zenject::Zenjector::Get();
+    zenjector->Install<::TwitchSongRequest::Installers::MenuInstaller *>(::Lapiz::Zenject::Location::Menu);
 }

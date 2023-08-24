@@ -47,7 +47,7 @@ add_library(
         ${c_file_list}
         ${twitchirc_cpp_file_list}
         ${twitchirc_c_file_list}
-        include/ModConfig.hpp src/ModSettingsViewController.cpp include/ModSettingsViewController.hpp src/Display.cpp include/Display.hpp include/MapObject.hpp)
+        include/ModConfig.hpp src/ModSettingsViewController.cpp include/ModSettingsViewController.hpp)
 
 target_include_directories(${COMPILE_ID} PRIVATE .)
 
@@ -63,6 +63,7 @@ target_include_directories(${COMPILE_ID} PRIVATE ${EXTERN_DIR}/includes/${CODEGE
 target_link_libraries(${COMPILE_ID} PRIVATE -llog)
 # add extern stuff like libs and other includes
 include(extern.cmake)
+include(assets_include.cmake)
 
 add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
         COMMAND ${CMAKE_STRIP} -d --strip-all
@@ -104,3 +105,4 @@ add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${a_file} debug/${file}
         COMMENT "Copy a files for ndk stack")
         endforeach()
+
