@@ -35,5 +35,6 @@ struct IncludedAsset {
 namespace IncludedAssets {
 
 	DECLARE_FILE(menu_bsml)
+	DECLARE_FILE(songItem_bsml)
 
 }
