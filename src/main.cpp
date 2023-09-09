@@ -2,6 +2,7 @@
 
 #include "ModConfig.hpp"
 #include "ModSettingsViewController.hpp"
+#include "FloatingMenu.hpp"
 
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
@@ -23,6 +24,9 @@
 #include "lapiz/shared/zenject/Zenjector.hpp"
 #include "lapiz/shared/AttributeRegistration.hpp"
 
+#include "GlobalNamespace/LevelSelectionNavigationController.hpp"
+
+
 #include <map>
 #include <thread>
 #include <iomanip>
@@ -31,6 +35,7 @@
 
 
 bool threadRunning = false;
+static UnityEngine::GameObject *menu;
 
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
@@ -62,6 +67,10 @@ extern "C" void setup(ModInfo& info) {
     getLogger().info("Completed setup!");
 }
 
+void download(std::string mapID) {
+
+}
+
 
 void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
     std::string username = ircMessage.prefix.nick;
@@ -78,6 +87,7 @@ void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
 
     auto songdetails = songDetails.get();
     auto& song = songdetails->songs.FindByMapId(code);
+
 
 
 }
@@ -158,6 +168,42 @@ MAKE_HOOK_MATCH(SceneManager_Internal_ActiveSceneChanged,
     }
 }
 
+MAKE_HOOK_MATCH(LevelSelectionNavigationControllerDidActivate, &GlobalNamespace::LevelSelectionNavigationController::DidActivate, void, GlobalNamespace::LevelSelectionNavigationController *self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+
+    LevelSelectionNavigationControllerDidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+
+    getLogger().info("Creating Menu");
+
+    if (firstActivation) TSRQ::FloatingMenu::get_instance()->Initialize();
+
+
+
+    /*if (firstActivation) {
+        menu = QuestUI::BeatSaberUI::CreateFloatingScreen(UnityEngine::Vector2(60, 150), UnityEngine::Vector3(0, 0, 0), UnityEngine::Vector3(0, 0, 0), 1.0f, true, true, 4);
+
+        QuestUI::BeatSaberUI::AddHoverHint(menu->get_transform()->get_gameObject(), "Move by Pressing a trigger");
+
+
+
+
+        getLogger().info("Created menu");
+        return;
+    }
+
+    if (menu) {
+        menu->get_gameObject()->set_active(true);
+    }*/
+}
+
+MAKE_HOOK_MATCH(LevelSelectionNavigationControllerDidDeactivate, &GlobalNamespace::LevelSelectionNavigationController::DidDeactivate, void, GlobalNamespace::LevelSelectionNavigationController *self, bool removedFromHierarchy, bool screenSystemDisabling) {
+
+    LevelSelectionNavigationControllerDidDeactivate(self, removedFromHierarchy, screenSystemDisabling);
+
+    if (menu) {
+        menu->get_gameObject()->set_active(false);
+    }
+}
+
 
 
 // Called later on in the game loading - a good time to install function hooks
@@ -176,5 +222,7 @@ extern "C" void load() {
 
     getLogger().info("Installing hooks...");
     INSTALL_HOOK(getLogger(), SceneManager_Internal_ActiveSceneChanged);
+    INSTALL_HOOK(getLogger(), LevelSelectionNavigationControllerDidActivate);
+    INSTALL_HOOK(getLogger(), LevelSelectionNavigationControllerDidDeactivate);
     getLogger().info("Installed all hooks!");
 }

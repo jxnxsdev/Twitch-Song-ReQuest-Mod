@@ -34,6 +34,6 @@ struct IncludedAsset {
     const IncludedAsset name { _binary_##name##_start, _binary_##name##_end};
 namespace IncludedAssets {
 
-	DECLARE_FILE(settings_bsml)
+	DECLARE_FILE(menu_bsml)
 
 }
