@@ -2,7 +2,6 @@
 
 #include "ModConfig.hpp"
 #include "ModSettingsViewController.hpp"
-#include "Installers/MenuInstaller.hpp"
 
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
@@ -178,7 +177,4 @@ extern "C" void load() {
     getLogger().info("Installing hooks...");
     INSTALL_HOOK(getLogger(), SceneManager_Internal_ActiveSceneChanged);
     getLogger().info("Installed all hooks!");
-
-    auto zenjector = ::Lapiz::Zenject::Zenjector::Get();
-    zenjector->Install<::TwitchSongRequest::Installers::MenuInstaller *>(::Lapiz::Zenject::Location::Menu);
 }
