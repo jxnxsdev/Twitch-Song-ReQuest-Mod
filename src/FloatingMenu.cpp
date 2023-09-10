@@ -23,24 +23,8 @@ void TSRQ::FloatingMenu::ctor() {
 void TSRQ::FloatingMenu::Initialize() {
     if (initialized) return;
     
-    songList.push_back("Test1");
-    songList.push_back("Test1");
-    songList.push_back("Test1");
-    songList.push_back("Test1");
-    songList.push_back("Test1");
-    songList.push_back("Test1");
-     songList.push_back("Test1");
-    songList.push_back("Test1");
-    songList.push_back("Test1");
-    songList.push_back("Test1");
-    songList.push_back("Test1");
-    songList.push_back("Test1");
-     songList.push_back("Test1");
-    songList.push_back("Test1");
-    songList.push_back("Test1");
-    songList.push_back("Test1");
-    songList.push_back("Test1");
-    songList.push_back("Test1");
+    songList.push_back("25f");
+
 
     menu = QuestUI::BeatSaberUI::CreateFloatingScreen(UnityEngine::Vector2(80.0f, 72.0f), UnityEngine::Vector3(0, 4.0f, 0), UnityEngine::Vector3(0, 0, 0), 0.0f, true, true, 3);
     BSML::parse_and_construct(IncludedAssets::menu_bsml, menu->get_transform(), this);

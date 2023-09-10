@@ -75,6 +75,11 @@
       "id": "lapiz",
       "versionRange": "^0.1.11",
       "additionalData": {}
+    },
+    {
+      "id": "songloader",
+      "versionRange": "^0.10.17",
+      "additionalData": {}
     }
   ],
   "workspace": {

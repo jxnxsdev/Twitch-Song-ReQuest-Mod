@@ -16,6 +16,7 @@
 #include "bsml/shared/macros.hpp"
 #include "bsml/shared/BSML.hpp"
 #include "bsml/shared/BSML/Components/CustomListTableData.hpp"
+#include "song-details/shared/SongDetails.hpp"
 
 #define GET_FIND_METHOD(mPtr) il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 

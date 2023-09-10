@@ -1,14 +1,32 @@
 #include "SongListCell.hpp"
 
 #include "UnityEngine/RectTransform.hpp"
+#include "songdownloader/shared/BeatSaverAPI.hpp"
+#include "songloader/shared/API.hpp"
+#include "main.hpp"
 
 DEFINE_TYPE(TSRQ, CustomSongListTableCell)
 namespace TSRQ {
     CustomSongListTableCell* CustomSongListTableCell::PopulateWithSongData(std::string entry) {
-        songName->set_text(entry);
-        // levelAuthorName->set_text(entry->levelAuthorName);
+        getLogger().info("Created cell");
+        /*std::optional<GlobalNamespace::CustomPreviewBeatmapLevel*> localMap = RuntimeSongLoader::API::GetLevelById(entry);
+
+        if (localMap.has_value()) {
+            songName->set_text(localMap.value()->songName + " | " + localMap.value()->songAuthorName);
+            levelAuthorName->set_text(localMap.value()->levelAuthorName);
+            statusLabel->set_text("Downloaded!");
+        }else {
+            statusLabel->set_text("Click to download");
+            songName->set_text("unknown");
+            songName->set_text("unknown");
+        }*/
+
+        /*songName->set_text(beatmap->GetMetadata().GetSongName() + " | " + beatmap->GetMetadata().GetSongAuthorName());
+        levelAuthorName->set_text(beatmap->GetMetadata().GetLevelAuthorName());*/
+
+
         // statusLabel->set_text(entry->statusMessage());
-        // this->entry = entry;
+        this->entry = entry;
         // entry->UpdateProgressHandler = [this]() {
         //     UpdateProgress();
         // };

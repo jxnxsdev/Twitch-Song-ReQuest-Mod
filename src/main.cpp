@@ -3,6 +3,7 @@
 #include "ModConfig.hpp"
 #include "ModSettingsViewController.hpp"
 #include "FloatingMenu.hpp"
+#include "SongListTableData.hpp"
 
 #include "beatsaber-hook/shared/utils/hooking.hpp"
 #include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
@@ -67,14 +68,11 @@ extern "C" void setup(ModInfo& info) {
     getLogger().info("Completed setup!");
 }
 
-void download(std::string mapID) {
-
-}
-
-
 void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
     std::string username = ircMessage.prefix.nick;
     std::string message = ircMessage.parameters.at(ircMessage.parameters.size() - 1);
+
+    getLogger().info("%s", message.c_str());
 
     // check if the message begins with "!bsr"
     if(!message.starts_with("!bsr")) return;
@@ -85,11 +83,15 @@ void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
     // get the code
     std::string code = message.substr(5);
 
-    auto songdetails = songDetails.get();
-    auto& song = songdetails->songs.FindByMapId(code);
+    /*auto songdetails = songDetails.get();
+    auto& song = songdetails->songs.FindByMapId(code);*/
 
+    SafePtrUnity<TSRQ::FloatingMenu> fmenu = TSRQ::FloatingMenu::get_instance();
 
+    fmenu->songList.push_back(code);
+    fmenu->RefreshTable();
 
+    getLogger().info("pushed song");
 }
 
 #define JOIN_RETRY_DELAY 3000

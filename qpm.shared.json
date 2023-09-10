@@ -76,6 +76,11 @@
         "id": "lapiz",
         "versionRange": "^0.1.11",
         "additionalData": {}
+      },
+      {
+        "id": "songloader",
+        "versionRange": "^0.10.17",
+        "additionalData": {}
       }
     ],
     "workspace": {
@@ -254,20 +259,6 @@
     },
     {
       "dependency": {
-        "id": "custom-types",
-        "versionRange": "=0.15.24",
-        "additionalData": {
-          "soLink": "https://github.com/sc2ad/Il2CppQuestTypePatching/releases/download/v0.15.24/libcustom-types.so",
-          "debugSoLink": "https://github.com/sc2ad/Il2CppQuestTypePatching/releases/download/v0.15.24/debug_libcustom-types.so",
-          "overrideSoName": "libcustom-types.so",
-          "modLink": "https://github.com/sc2ad/Il2CppQuestTypePatching/releases/download/v0.15.24/CustomTypes.qmod",
-          "branchName": "version-v0.15.24"
-        }
-      },
-      "version": "0.15.24"
-    },
-    {
-      "dependency": {
         "id": "songloader",
         "versionRange": "=0.10.17",
         "additionalData": {
@@ -279,6 +270,20 @@
         }
       },
       "version": "0.10.17"
+    },
+    {
+      "dependency": {
+        "id": "custom-types",
+        "versionRange": "=0.15.24",
+        "additionalData": {
+          "soLink": "https://github.com/sc2ad/Il2CppQuestTypePatching/releases/download/v0.15.24/libcustom-types.so",
+          "debugSoLink": "https://github.com/sc2ad/Il2CppQuestTypePatching/releases/download/v0.15.24/debug_libcustom-types.so",
+          "overrideSoName": "libcustom-types.so",
+          "modLink": "https://github.com/sc2ad/Il2CppQuestTypePatching/releases/download/v0.15.24/CustomTypes.qmod",
+          "branchName": "version-v0.15.24"
+        }
+      },
+      "version": "0.15.24"
     },
     {
       "dependency": {
