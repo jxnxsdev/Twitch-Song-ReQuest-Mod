@@ -68,30 +68,29 @@ extern "C" void setup(ModInfo& info) {
     getLogger().info("Completed setup!");
 }
 
+std::vector<std::string> requestedSongs;
+
 void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
     std::string username = ircMessage.prefix.nick;
     std::string message = ircMessage.parameters.at(ircMessage.parameters.size() - 1);
 
     getLogger().info("%s", message.c_str());
-
-    // check if the message begins with "!bsr"
     if(!message.starts_with("!bsr")) return;
-
-    // check if there is a code after !bsr. The synctac is "!bsr <code>
     if(message.length() < 6) return;
-
-    // get the code
     std::string code = message.substr(5);
+    if(std::find(requestedSongs.begin(), requestedSongs.end(), code) != requestedSongs.end()) return;
 
-    /*auto songdetails = songDetails.get();
-    auto& song = songdetails->songs.FindByMapId(code);*/
 
-    SafePtrUnity<TSRQ::FloatingMenu> fmenu = TSRQ::FloatingMenu::get_instance();
+    QuestUI::MainThreadScheduler::Schedule([code, client] {
+        auto songdetails = songDetails.get();
+        auto& song = songdetails->songs.FindByMapId(code);
+        if(!song.index) return;
 
-    fmenu->songList.push_back(code);
-    fmenu->RefreshTable();
+        requestedSongs.push_back(code);
+        TSRQ::FloatingMenu::get_instance()->push(code);
+    });
 
-    getLogger().info("pushed song");
+    getLogger().info("pushed song %s", code.c_str());
 }
 
 #define JOIN_RETRY_DELAY 3000

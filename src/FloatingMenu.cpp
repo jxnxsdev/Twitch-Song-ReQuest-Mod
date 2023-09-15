@@ -49,8 +49,9 @@ void TSRQ::FloatingMenu::Initialize() {
 
     
 
-    initialized = true;
+
     this->RefreshTable();
+    initialized = true;
 }
 
 SafePtrUnity<TSRQ::FloatingMenu> TSRQ::FloatingMenu::get_instance() {
@@ -108,4 +109,11 @@ void TSRQ::FloatingMenu::RefreshTable(bool fullReload)
 void TSRQ::FloatingMenu::SelectSong(HMUI::TableView *table, int id)
 {
     getLogger().info("TSRQ: Cell is clicked");
+}
+
+void TSRQ::FloatingMenu::push(std::string song)
+{
+    getLogger().info("TSRQ: Pushing song %s", song.c_str());
+    this->songList.push_back(song);
+    this->RefreshTable();
 }

@@ -28,7 +28,5 @@ void DidActivate(ViewController* self, bool firstActivation, bool addedToHierarc
         BeatSaberUI::AddHoverHint(underscoreButton->get_gameObject(), "Adds a underscore");
         LayoutElement* layoutElement = underscoreButton->GetComponent<LayoutElement*>();
         layoutElement->set_minWidth(4.0f);
-        /*AddConfigValueIncrementVector3(parent, getModConfig().PositionMenu, 2, 0.05f);
-        AddConfigValueIncrementVector3(parent, getModConfig().RotationMenu, 0, 1.0f);*/
     }
 }

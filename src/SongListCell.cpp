@@ -9,7 +9,7 @@ DEFINE_TYPE(TSRQ, CustomSongListTableCell)
 namespace TSRQ {
     CustomSongListTableCell* CustomSongListTableCell::PopulateWithSongData(std::string entry) {
         getLogger().info("Created cell");
-        /*std::optional<GlobalNamespace::CustomPreviewBeatmapLevel*> localMap = RuntimeSongLoader::API::GetLevelById(entry);
+        std::optional<GlobalNamespace::CustomPreviewBeatmapLevel*> localMap = RuntimeSongLoader::API::GetLevelById(entry);
 
         if (localMap.has_value()) {
             songName->set_text(localMap.value()->songName + " | " + localMap.value()->songAuthorName);
@@ -17,9 +17,15 @@ namespace TSRQ {
             statusLabel->set_text("Downloaded!");
         }else {
             statusLabel->set_text("Click to download");
-            songName->set_text("unknown");
-            songName->set_text("unknown");
-        }*/
+            std::optional<BeatSaver::Beatmap> beatmap = BeatSaver::API::GetBeatmapByHash(entry);
+            if (beatmap) {
+                songName->set_text(beatmap->GetMetadata().GetSongName() + " | " + beatmap->GetMetadata().GetSongAuthorName());
+                levelAuthorName->set_text(beatmap->GetMetadata().GetLevelAuthorName());
+            }else {
+                songName->set_text("Song not found");
+                levelAuthorName->set_text("Song not found");
+            }
+        }
 
         /*songName->set_text(beatmap->GetMetadata().GetSongName() + " | " + beatmap->GetMetadata().GetSongAuthorName());
         levelAuthorName->set_text(beatmap->GetMetadata().GetLevelAuthorName());*/

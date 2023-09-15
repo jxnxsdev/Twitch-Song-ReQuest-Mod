@@ -10,6 +10,7 @@
 #include "HMUI/TableCell.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
 #include "UnityEngine/GameObject.hpp"
+#include "main.hpp"
 
 #ifndef DECLARE_OVERRIDE_METHOD_MATCH
 #define DECLARE_OVERRIDE_METHOD_MATCH(retval, method, mptr, ...) \
@@ -32,11 +33,21 @@ DECLARE_CLASS_CODEGEN_INTERFACES(TSRQ, FloatingMenu, UnityEngine::MonoBehaviour,
     DECLARE_OVERRIDE_METHOD_MATCH(int, NumberOfCells, &HMUI::TableView::IDataSource::NumberOfCells);
 
     public:
-        HMUI::TableView* songListTable() {if(songTableData) {return songTableData->tableView;} else return nullptr;}
+        SafePtrUnity<HMUI::TableView> songListTable() {
+            if(songTableData) {
+                getLogger().info("songTableData is not null");
+                return songTableData->tableView;
+            }
+            else {
+                getLogger().info("songTableData is null");
+                return nullptr;
+            }
+        }
         void Initialize();
         void RefreshTable(bool fullReload = true);
         static void delete_instance();
         static SafePtrUnity<TSRQ::FloatingMenu> get_instance();
+        void push(std::string songName);
         // TODO: Figure out how to get this to work and not to have it being set in ctor
         float cellSize = 12.0f;
         std::vector<std::string> songList;
