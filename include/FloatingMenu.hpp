@@ -33,7 +33,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(TSRQ, FloatingMenu, UnityEngine::MonoBehaviour,
     DECLARE_OVERRIDE_METHOD_MATCH(int, NumberOfCells, &HMUI::TableView::IDataSource::NumberOfCells);
 
     public:
-        SafePtrUnity<HMUI::TableView> songListTable() {
+        HMUI::TableView* songListTable() {
             if(songTableData) {
                 getLogger().info("songTableData is not null");
                 return songTableData->tableView;

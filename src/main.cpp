@@ -81,14 +81,13 @@ void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
     if(std::find(requestedSongs.begin(), requestedSongs.end(), code) != requestedSongs.end()) return;
 
 
-    QuestUI::MainThreadScheduler::Schedule([code, client] {
-        auto songdetails = songDetails.get();
-        auto& song = songdetails->songs.FindByMapId(code);
-        if(!song.index) return;
+    auto songdetails = songDetails.get();
+    auto& song = songdetails->songs.FindByHash(code);
+    if(!song) return;
 
-        requestedSongs.push_back(code);
-        TSRQ::FloatingMenu::get_instance()->push(code);
-    });
+    requestedSongs.push_back(code);
+    if(!TSRQ::FloatingMenu::get_instance()->initialized) return;
+    TSRQ::FloatingMenu::get_instance()->push(code);
 
     getLogger().info("pushed song %s", code.c_str());
 }

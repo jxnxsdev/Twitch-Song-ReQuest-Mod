@@ -59,7 +59,8 @@ SafePtrUnity<TSRQ::FloatingMenu> TSRQ::FloatingMenu::get_instance() {
 
     auto go = UnityEngine::GameObject::New_ctor(StringW("TSRQ Floating Menu"));
     Object::DontDestroyOnLoad(go);
-    return go->AddComponent<TSRQ::FloatingMenu*>();
+    instance = go->AddComponent<TSRQ::FloatingMenu*>();
+    return instance;
 }
 
 void TSRQ::FloatingMenu::delete_instance() {
