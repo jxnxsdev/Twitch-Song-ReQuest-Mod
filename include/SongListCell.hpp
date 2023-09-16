@@ -34,7 +34,7 @@ DECLARE_CLASS_CODEGEN(TSRQ, CustomSongListTableCell, HMUI::TableCell,
 public:
     // Song entry to have a reference to the song data
     std::string entry;
-    CustomSongListTableCell* PopulateWithSongData(std::string entry);
+    CustomSongListTableCell* PopulateWithSongData(std::optional<BeatSaver::Beatmap> song);
     // void UpdateProgress();
     // void RefreshBar();
     void RefreshBgState();

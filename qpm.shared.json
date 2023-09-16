@@ -43,18 +43,8 @@
         "additionalData": {}
       },
       {
-        "id": "config-utils",
-        "versionRange": "^1.1.0",
-        "additionalData": {}
-      },
-      {
         "id": "questui",
         "versionRange": "^0.17.12",
-        "additionalData": {}
-      },
-      {
-        "id": "songdownloader",
-        "versionRange": "^0.6.0",
         "additionalData": {}
       },
       {
@@ -80,6 +70,16 @@
       {
         "id": "bsml",
         "versionRange": "^0.3.1",
+        "additionalData": {}
+      },
+      {
+        "id": "config-utils",
+        "versionRange": "^1.1.0",
+        "additionalData": {}
+      },
+      {
+        "id": "songdownloader",
+        "versionRange": "^0.6.0",
         "additionalData": {}
       }
     ],
@@ -127,16 +127,6 @@
     },
     {
       "dependency": {
-        "id": "libil2cpp",
-        "versionRange": "=0.2.3",
-        "additionalData": {
-          "headersOnly": true
-        }
-      },
-      "version": "0.2.3"
-    },
-    {
-      "dependency": {
         "id": "rapidjson-macros",
         "versionRange": "=1.0.0",
         "additionalData": {
@@ -145,6 +135,16 @@
         }
       },
       "version": "1.0.0"
+    },
+    {
+      "dependency": {
+        "id": "libil2cpp",
+        "versionRange": "=0.2.3",
+        "additionalData": {
+          "headersOnly": true
+        }
+      },
+      "version": "0.2.3"
     },
     {
       "dependency": {
@@ -301,17 +301,16 @@
     },
     {
       "dependency": {
-        "id": "lapiz",
-        "versionRange": "=0.1.11",
+        "id": "songdownloader",
+        "versionRange": "=0.6.0",
         "additionalData": {
-          "soLink": "https://github.com/raineio/Lapiz/releases/download/v0.1.11/liblapiz.so",
-          "debugSoLink": "https://github.com/raineio/Lapiz/releases/download/v0.1.11/debug_liblapiz.so",
-          "overrideSoName": "liblapiz.so",
-          "modLink": "https://github.com/raineio/Lapiz/releases/download/v0.1.11/Lapiz.qmod",
-          "branchName": "version-v0.1.11"
+          "soLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.6.0/libsongdownloader.so",
+          "overrideSoName": "libsongdownloader.so",
+          "modLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.6.0/SongDownloader.qmod",
+          "branchName": "version/v0_6_0"
         }
       },
-      "version": "0.1.11"
+      "version": "0.6.0"
     },
     {
       "dependency": {
@@ -327,16 +326,17 @@
     },
     {
       "dependency": {
-        "id": "songdownloader",
-        "versionRange": "=0.6.0",
+        "id": "lapiz",
+        "versionRange": "=0.1.11",
         "additionalData": {
-          "soLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.6.0/libsongdownloader.so",
-          "overrideSoName": "libsongdownloader.so",
-          "modLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.6.0/SongDownloader.qmod",
-          "branchName": "version/v0_6_0"
+          "soLink": "https://github.com/raineio/Lapiz/releases/download/v0.1.11/liblapiz.so",
+          "debugSoLink": "https://github.com/raineio/Lapiz/releases/download/v0.1.11/debug_liblapiz.so",
+          "overrideSoName": "liblapiz.so",
+          "modLink": "https://github.com/raineio/Lapiz/releases/download/v0.1.11/Lapiz.qmod",
+          "branchName": "version-v0.1.11"
         }
       },
-      "version": "0.6.0"
+      "version": "0.1.11"
     },
     {
       "dependency": {

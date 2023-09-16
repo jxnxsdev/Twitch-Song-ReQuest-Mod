@@ -22,8 +22,7 @@ void TSRQ::FloatingMenu::ctor() {
 
 void TSRQ::FloatingMenu::Initialize() {
     if (initialized) return;
-    
-    songList.push_back("25f");
+
 
 
     menu = QuestUI::BeatSaberUI::CreateFloatingScreen(UnityEngine::Vector2(80.0f, 72.0f), UnityEngine::Vector3(0, 4.0f, 0), UnityEngine::Vector3(0, 0, 0), 0.0f, true, true, 3);
@@ -112,9 +111,10 @@ void TSRQ::FloatingMenu::SelectSong(HMUI::TableView *table, int id)
     getLogger().info("TSRQ: Cell is clicked");
 }
 
-void TSRQ::FloatingMenu::push(std::string song)
+void TSRQ::FloatingMenu::push(std::optional<BeatSaver::Beatmap> song)
 {
-    getLogger().info("TSRQ: Pushing song %s", song.c_str());
+    if (!song.has_value()) return;
+    getLogger().info("TSRQ: Pushing song %s", song->GetMetadata().GetSongName().c_str());
     this->songList.push_back(song);
     this->RefreshTable();
 }

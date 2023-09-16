@@ -42,18 +42,8 @@
       "additionalData": {}
     },
     {
-      "id": "config-utils",
-      "versionRange": "^1.1.0",
-      "additionalData": {}
-    },
-    {
       "id": "questui",
       "versionRange": "^0.17.12",
-      "additionalData": {}
-    },
-    {
-      "id": "songdownloader",
-      "versionRange": "^0.6.0",
       "additionalData": {}
     },
     {
@@ -79,6 +69,16 @@
     {
       "id": "bsml",
       "versionRange": "^0.3.1",
+      "additionalData": {}
+    },
+    {
+      "id": "config-utils",
+      "versionRange": "^1.1.0",
+      "additionalData": {}
+    },
+    {
+      "id": "songdownloader",
+      "versionRange": "^0.6.0",
       "additionalData": {}
     }
   ],
