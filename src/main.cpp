@@ -83,7 +83,22 @@ void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
 
     if(std::find(requestedSongs.begin(), requestedSongs.end(), code) != requestedSongs.end()) return;
 
-    BeatSaver::API::GetBeatmapByKeyAsync(code, [code](std::optional<BeatSaver::Beatmap> beatmap) {
+    std::optional<BeatSaver::Beatmap> beatmap = BeatSaver::API::GetBeatmapByKey(code);
+
+    if (beatmap.has_value()) {
+        getLogger().info("Found beatmap %s on BeatSaver", beatmap.value().GetName().c_str());
+
+        getLogger().info("Pushing Beatmap...");
+        //TSRQ::FloatingMenu::get_instance()->push(beatmap);
+
+        //requestedSongs.push_back(code);
+
+        getLogger().info("pushed song %s", code.c_str());
+    }else {
+        getLogger().info("Song with hash %s not found", code.c_str());
+    }
+
+    /*BeatSaver::API::GetBeatmapByKeyAsync(code, [code](std::optional<BeatSaver::Beatmap> beatmap) {
         if (beatmap.has_value()) {
             getLogger().info("Found beatmap %s on BeatSaver", beatmap.value().GetName().c_str());
 
@@ -96,7 +111,7 @@ void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
         }else {
             getLogger().info("Song with hash %s not found", code.c_str());
         }
-    });
+    });*/
 
 }
 
