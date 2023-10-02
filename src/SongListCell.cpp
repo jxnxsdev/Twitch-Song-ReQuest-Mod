@@ -7,18 +7,23 @@
 
 DEFINE_TYPE(TSRQ, CustomSongListTableCell)
 namespace TSRQ {
-    CustomSongListTableCell* CustomSongListTableCell::PopulateWithSongData(std::optional<BeatSaver::Beatmap> song) {
-        getLogger().info("Created cell");
+    CustomSongListTableCell* CustomSongListTableCell::PopulateWithSongData(TSRQ::SongListObject* songListObject) {
+
+        std::optional<BeatSaver::Beatmap> song = songListObject->song;
 
         songName->set_text(song.value().GetName());
         levelAuthorName->set_text(song.value().GetMetadata().GetLevelAuthorName());
 
-        std::optional<GlobalNamespace::CustomPreviewBeatmapLevel*> local =  RuntimeSongLoader::API::GetLevelByHash(song->GetId());
-
-        if (local.has_value()) {
+        if (songListObject->isDownloaded) {
             statusLabel->set_text("In Collection");
+            this->entry = songListObject;
+            return this;
+        }else if (songListObject->downloading) {
+            statusLabel->set_text("Downloading...");
+            this->entry = songListObject;
+            return this;
         }else {
-            statusLabel->set_text("Click to Download");
+            statusLabel->set_text("Click to download");
         }
 
         /*songName->set_text(beatmap->GetMetadata().GetSongName() + " | " + beatmap->GetMetadata().GetSongAuthorName());
@@ -26,7 +31,7 @@ namespace TSRQ {
 
 
         // statusLabel->set_text(entry->statusMessage());
-        this->entry = song;
+        this->entry = songListObject;
         // entry->UpdateProgressHandler = [this]() {
         //     UpdateProgress();
         // };

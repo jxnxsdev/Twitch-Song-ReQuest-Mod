@@ -9,6 +9,8 @@
 #include "bsml/shared/BSML.hpp"
 #include "GlobalNamespace/LevelCollectionTableView.hpp"
 #include "assets.hpp"
+#include "SongListObject.hpp"
+#include "songloader/shared/API.hpp"
 #define coro(coroutine) GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(coroutine))
 #include "main.hpp"
 DEFINE_TYPE(TSRQ, FloatingMenu);
@@ -36,7 +38,12 @@ void TSRQ::FloatingMenu::Initialize() {
         getLogger().info("TSRQ: SongTable Data Initialized");
     }
     
+    this->PostParse();
+    this->RefreshTable();
+    initialized = true;
+}
 
+void TSRQ::FloatingMenu::PostParse() {
     // BSML has a bug that stops getting the correct platform helper and on game reset it dies and the scrollhelper stays invalid and scroll doesn't work
     auto platformHelper = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelCollectionTableView*>().First()->GetComponentInChildren<HMUI::ScrollView*>()->platformHelper;
     if (platformHelper == nullptr) {
@@ -45,12 +52,6 @@ void TSRQ::FloatingMenu::Initialize() {
             x->platformHelper=platformHelper;
         }
     }
-
-    
-
-
-    this->RefreshTable();
-    initialized = true;
 }
 
 SafePtrUnity<TSRQ::FloatingMenu> TSRQ::FloatingMenu::get_instance() {
@@ -84,7 +85,6 @@ int TSRQ::FloatingMenu::NumberOfCells()
 
 HMUI::TableCell *TSRQ::FloatingMenu::CellForIdx(HMUI::TableView *tableView, int idx)
 {
-    getLogger().info("TSRQ: Cell for idx %d", idx);
     return TSRQ::SongListTableData::GetCell(tableView)->PopulateWithSongData(songList[idx]);
 }
 
@@ -110,13 +110,40 @@ void TSRQ::FloatingMenu::SelectSong(HMUI::TableView *table, int id)
 {
     getLogger().info("TSRQ: Cell is clicked");
 
+    if (NumberOfCells() <= id) {
+        getLogger().info("How did you even click a non existent cell!!!???!!!??");
+    }
 
+    if(songList[id]->downloading == true || songList[id]->isDownloaded == true) {
+        return;
+    }
+
+    songList[id]->downloading = true;
+    this->RefreshTable();
+
+    songList[id]->song->DownloadLatestBeatmapAsync([id, this](bool finished){
+        if (finished) {
+            songList[id]->setIsDownloaded(true);
+            songList[id]->setIsDownloading(false);
+            this->RefreshTable();
+        }
+    }, [id](float progress){
+
+    });
 }
 
-void TSRQ::FloatingMenu::push(std::optional<BeatSaver::Beatmap> song)
+void TSRQ::FloatingMenu::push(TSRQ::SongListObject* songListObject)
 {
+    std::optional<BeatSaver::Beatmap> song = songListObject->song;
     if (!song.has_value()) return;
     getLogger().info("TSRQ: Pushing song %s", song->GetMetadata().GetSongName().c_str());
-    this->songList.push_back(song);
+
+    std::optional<GlobalNamespace::CustomPreviewBeatmapLevel*> local =  RuntimeSongLoader::API::GetLevelByHash(song->GetVersions().front().GetHash());
+
+    if(local.has_value()) {
+        songListObject->isDownloaded = true;
+    }
+
+    this->songList.push_back(songListObject);
     this->RefreshTable();
 }

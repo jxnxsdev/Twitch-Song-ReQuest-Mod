@@ -18,6 +18,7 @@
 #include "bsml/shared/BSML/Components/CustomListTableData.hpp"
 #include "song-details/shared/SongDetails.hpp"
 #include "songdownloader/shared/BeatSaverAPI.hpp"
+#include "SongListObject.hpp"
 
 #define GET_FIND_METHOD(mPtr) il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 
@@ -34,8 +35,8 @@ DECLARE_CLASS_CODEGEN(TSRQ, CustomSongListTableCell, HMUI::TableCell,
 
 public:
     // Song entry to have a reference to the song data
-    std::optional<BeatSaver::Beatmap> entry;
-    CustomSongListTableCell* PopulateWithSongData(std::optional<BeatSaver::Beatmap> song);
+    TSRQ::SongListObject entry;
+    CustomSongListTableCell* PopulateWithSongData(TSRQ::SongListObject* songListObject);
     // void UpdateProgress();
     // void RefreshBar();
     void RefreshBgState();

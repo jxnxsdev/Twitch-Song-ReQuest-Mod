@@ -29,6 +29,8 @@
 
 #include "songdownloader/shared/BeatSaverAPI.hpp"
 
+#include "SongListObject.hpp"
+#include "songloader/shared/API.hpp"
 
 #include <map>
 #include <thread>
@@ -85,7 +87,11 @@ void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
         BeatSaver::API::GetBeatmapByKeyAsync(code, [code](std::optional<BeatSaver::Beatmap> beatmap) {
             if (beatmap.has_value()) {
                 getLogger().info("Found beatmap %s on BeatSaver", beatmap.value().GetName().c_str());
-                TSRQ::FloatingMenu::get_instance()->push(beatmap);
+
+                TSRQ::SongListObject* songListObject = new TSRQ::SongListObject;
+                songListObject->setSong(beatmap);
+
+                TSRQ::FloatingMenu::get_instance()->push(songListObject);
 
                 requestedSongs.push_back(code);
 

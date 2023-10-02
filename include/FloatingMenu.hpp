@@ -12,6 +12,7 @@
 #include "UnityEngine/GameObject.hpp"
 #include "main.hpp"
 #include "songdownloader/shared/BeatSaverAPI.hpp"
+#include "SongListObject.hpp"
 
 #ifndef DECLARE_OVERRIDE_METHOD_MATCH
 #define DECLARE_OVERRIDE_METHOD_MATCH(retval, method, mptr, ...) \
@@ -27,6 +28,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(TSRQ, FloatingMenu, UnityEngine::MonoBehaviour,
     DECLARE_INSTANCE_FIELD(bool, initialized);
     DECLARE_INSTANCE_FIELD(UnityEngine::GameObject*, menu);
     DECLARE_INSTANCE_METHOD(void, SelectSong, HMUI::TableView* table, int id);
+    DECLARE_INSTANCE_METHOD(void, PostParse);
     DECLARE_INSTANCE_FIELD(BSML::CustomListTableData*, songTableData);
 
     DECLARE_OVERRIDE_METHOD_MATCH(HMUI::TableCell*, CellForIdx, &HMUI::TableView::IDataSource::CellForIdx, HMUI::TableView* tableView, int idx);
@@ -48,10 +50,10 @@ DECLARE_CLASS_CODEGEN_INTERFACES(TSRQ, FloatingMenu, UnityEngine::MonoBehaviour,
         void RefreshTable(bool fullReload = true);
         static void delete_instance();
         static SafePtrUnity<TSRQ::FloatingMenu> get_instance();
-        void push(std::optional<BeatSaver::Beatmap> beatmap);
+        void push(TSRQ::SongListObject* songListObject);
         // TODO: Figure out how to get this to work and not to have it being set in ctor
         float cellSize = 12.0f;
-        std::vector<std::optional<BeatSaver::Beatmap>> songList;
+        std::vector<TSRQ::SongListObject*> songList;
 
 private:
     static SafePtrUnity<TSRQ::FloatingMenu> instance;
