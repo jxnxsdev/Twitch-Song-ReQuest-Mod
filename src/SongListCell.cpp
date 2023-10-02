@@ -12,14 +12,21 @@ namespace TSRQ {
 
         songName->set_text(song.value().GetName());
         levelAuthorName->set_text(song.value().GetMetadata().GetLevelAuthorName());
-        statusLabel->set_text("Status");
+
+        std::optional<GlobalNamespace::CustomPreviewBeatmapLevel*> local =  RuntimeSongLoader::API::GetLevelByHash(song->GetId());
+
+        if (local.has_value()) {
+            statusLabel->set_text("In Collection");
+        }else {
+            statusLabel->set_text("Click to Download");
+        }
 
         /*songName->set_text(beatmap->GetMetadata().GetSongName() + " | " + beatmap->GetMetadata().GetSongAuthorName());
         levelAuthorName->set_text(beatmap->GetMetadata().GetLevelAuthorName());*/
 
 
         // statusLabel->set_text(entry->statusMessage());
-        this->entry = song->GetName();
+        this->entry = song;
         // entry->UpdateProgressHandler = [this]() {
         //     UpdateProgress();
         // };

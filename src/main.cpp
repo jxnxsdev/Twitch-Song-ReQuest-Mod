@@ -75,8 +75,6 @@ std::vector<std::string> requestedSongs;
 void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
     std::string username = ircMessage.prefix.nick;
     std::string message = ircMessage.parameters.at(ircMessage.parameters.size() - 1);
-
-    getLogger().info("%s", message.c_str());
     if(!message.starts_with("!bsr")) return;
     if(message.length() < 6) return;
     std::string code = message.substr(5);
@@ -87,15 +85,13 @@ void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
         BeatSaver::API::GetBeatmapByKeyAsync(code, [code](std::optional<BeatSaver::Beatmap> beatmap) {
             if (beatmap.has_value()) {
                 getLogger().info("Found beatmap %s on BeatSaver", beatmap.value().GetName().c_str());
+                TSRQ::FloatingMenu::get_instance()->push(beatmap);
 
-                //getLogger().info("Pushing Beatmap...");
-                //TSRQ::FloatingMenu::get_instance()->push(beatmap);
-
-                //requestedSongs.push_back(code);
+                requestedSongs.push_back(code);
 
                 getLogger().info("pushed song %s", code.c_str());
             }else {
-                getLogger().info("Song with hash %s not found", code.c_str());
+                getLogger().info("Song with key %s not found", code.c_str());
             }
         });
 

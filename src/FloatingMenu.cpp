@@ -109,6 +109,8 @@ void TSRQ::FloatingMenu::RefreshTable(bool fullReload)
 void TSRQ::FloatingMenu::SelectSong(HMUI::TableView *table, int id)
 {
     getLogger().info("TSRQ: Cell is clicked");
+
+
 }
 
 void TSRQ::FloatingMenu::push(std::optional<BeatSaver::Beatmap> song)
