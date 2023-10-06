@@ -2,7 +2,7 @@
 include(qpm_defines.cmake)
 
 # override mod id
-set(MOD_ID "TwitchSongRequest")
+set(MOD_ID "TwitchSongReQuest")
 
 # Enable link time optimization
 # In my experience, this can be highly unstable but it nets a huge size optimization and likely performance
@@ -24,6 +24,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED 20)
 # define that stores the actual source directory
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(INCLUDE_TWITCHIRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/TwitchIRC)
 
 # compile options used
 add_compile_options(-frtti -fexceptions)
@@ -35,6 +36,8 @@ add_compile_definitions(MOD_ID=\"${MOD_ID}\")
 # recursively get all src files
 RECURSE_FILES(cpp_file_list ${SOURCE_DIR}/*.cpp)
 RECURSE_FILES(c_file_list ${SOURCE_DIR}/*.c)
+RECURSE_FILES(twitchirc_cpp_file_list ${INCLUDE_TWITCHIRC_DIR}/*.cpp)
+RECURSE_FILES(twitchirc_c_file_list ${INCLUDE_TWITCHIRC_DIR}/*.c)
 
 # add all src files to compile
 add_library(
@@ -42,7 +45,9 @@ add_library(
         SHARED
         ${cpp_file_list}
         ${c_file_list}
-        include/config.hpp include/easywsclient.hpp src/easywsclient.cpp src/ModSettingVC.cpp include/ModSettingVC.hpp include/MapObject.hpp include/CT/Handler.hpp src/CT/Handler.cpp)
+        ${twitchirc_cpp_file_list}
+        ${twitchirc_c_file_list}
+        include/ModConfig.hpp src/ModSettingsViewController.cpp include/ModSettingsViewController.hpp)
 
 target_include_directories(${COMPILE_ID} PRIVATE .)
 
@@ -58,6 +63,7 @@ target_include_directories(${COMPILE_ID} PRIVATE ${EXTERN_DIR}/includes/${CODEGE
 target_link_libraries(${COMPILE_ID} PRIVATE -llog)
 # add extern stuff like libs and other includes
 include(extern.cmake)
+include(assets_include.cmake)
 
 add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
         COMMAND ${CMAKE_STRIP} -d --strip-all
@@ -99,3 +105,4 @@ add_custom_command(TARGET ${COMPILE_ID} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${a_file} debug/${file}
         COMMENT "Copy a files for ndk stack")
         endforeach()
+

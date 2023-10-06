@@ -2,7 +2,7 @@
   "configurations": [
     {
       "defines": [
-        "MOD_ID=\"TwitchSongRequest\"",
+        "MOD_ID=\"TwitchSongReQuest\"",
         "VERSION=\"0.1.0\"",
         "__GNUC__",
         "__aarch64__"

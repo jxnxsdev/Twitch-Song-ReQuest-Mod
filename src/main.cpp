@@ -1,8 +1,53 @@
 #include "main.hpp"
 
+#include "ModConfig.hpp"
+#include "ModSettingsViewController.hpp"
+#include "FloatingMenu.hpp"
+#include "SongListTableData.hpp"
+
+#include "beatsaber-hook/shared/utils/hooking.hpp"
+#include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+
+#include "custom-types/shared/register.hpp"
+
+#include "TwitchIRC/TwitchIRCClient.hpp"
+
+#include "questui/shared/QuestUI.hpp"
+#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+
+#include "UnityEngine/SceneManagement/Scene.hpp"
+#include "UnityEngine/SceneManagement/SceneManager.hpp"
+
+#include "song-details/shared/SongDetails.hpp"
+
+#include "bsml/shared/BSML.hpp"
+
+#include "lapiz/shared/zenject/Zenjector.hpp"
+#include "lapiz/shared/AttributeRegistration.hpp"
+
+#include "GlobalNamespace/LevelSelectionNavigationController.hpp"
+#include "GlobalNamespace/MainMenuViewController.hpp"
+
+#include "songdownloader/shared/BeatSaverAPI.hpp"
+
+#include "SongListObject.hpp"
+#include "songloader/shared/API.hpp"
+
+#include <map>
+#include <thread>
+#include <iomanip>
+#include <sstream>
+#include <chrono>
+
+
+bool threadRunning = false;
+static UnityEngine::GameObject *menu;
+
+bool menuInitialized = false;
+
+
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
-int connectionStatus = 2; // 0 = not connected, 1 = connected, 2 = not checked
-TwitchSongRequest::Handler* songRequestHandler = nullptr;
+static std::future<SongDetailsCache::SongDetails*> songDetails;
 
 // Loads the config from disk using our modInfo, then returns it for use
 // other config tools such as config-utils don't use this config, so it can be removed if those are in use
@@ -17,110 +62,6 @@ Logger& getLogger() {
     return *logger;
 }
 
-void CreateUI() {
-    getLogger().info("Creating UI");
-
-    UnityEngine::GameObject* canvas = QuestUI::BeatSaberUI::CreateCanvas();
-    songRequestHandler = canvas->AddComponent<TwitchSongRequest::Handler*>();
-    canvas->AddComponent<RectMask2D*>();
-    canvas->AddComponent<Backgroundable*>()->ApplyBackgroundWithAlpha("round-rect-panel", 0.75f);
-    RectTransform* transform = canvas->GetComponent<RectTransform*>();
-
-    // make it interactive
-    VRUIControls::VRGraphicRaycaster* raycaster = canvas->AddComponent<VRUIControls::VRGraphicRaycaster*>();
-
-    // create a scrollable container
-    UnityEngine::GameObject* layout = QuestUI::BeatSaberUI::CreateScrollableSettingsContainer(canvas->get_transform());
-
-    // add a text to the container
-    QuestUI::BeatSaberUI::CreateText(layout->get_transform(), "Twitch Song Requests");
-
-
-    VerticalLayoutGroup* verticalLayout = layout->GetComponent<VerticalLayoutGroup*>();
-    verticalLayout->set_childControlWidth(false);
-    verticalLayout->set_childControlHeight(true);
-    verticalLayout->set_childForceExpandWidth(true);
-    verticalLayout->set_childForceExpandHeight(false);
-    verticalLayout->set_childAlignment(TextAnchor::LowerLeft);
-    VRUIControls::VRGraphicRaycaster* layoutRaycaster = layout->AddComponent<VRUIControls::VRGraphicRaycaster*>();
-
-    GameObject* layoutGameObject = verticalLayout->get_gameObject();
-    RectTransform* layoutTransform = verticalLayout->get_rectTransform();
-    layoutTransform->set_pivot(UnityEngine::Vector2(0.0f, 0.0f));
-
-    songRequestHandler->LayoutTransform = layoutTransform;
-    songRequestHandler->Canvas = canvas;
-}
-
-
-// websocket stuff
-using easywsclient::WebSocket;
-static WebSocket::pointer ws = NULL;
-
-void AddSongObject(std::string name, std::string artist, std::string id) {
-    MapObject mapObject = {};
-    mapObject.SongName = name;
-    mapObject.SongArtist = artist;
-    mapObject.SongID = id;
-    mapObject.GameObject = nullptr;
-
-    if(songRequestHandler) {
-        songRequestHandler->AddMapObject(mapObject);
-    }
-}
-
-MAKE_HOOK_MATCH(SceneManager_Internal_ActiveSceneChanged, &UnityEngine::SceneManagement::SceneManager::Internal_ActiveSceneChanged, void, UnityEngine::SceneManagement::Scene prevScene, UnityEngine::SceneManagement::Scene nextScene) {
-    SceneManager_Internal_ActiveSceneChanged(prevScene, nextScene);
-
-    if(nextScene.IsValid()) {
-        std::string name = to_utf8(csstrtostr(nextScene.get_name()));
-        if(name.find("Menu") != std::string::npos) {
-            if (!songRequestHandler) {
-                CreateUI();
-            }
-        }
-    }
-}
-
-void handle_message(const std::string & message){
-    // log the message to the console
-    const char *logMessage;
-    logMessage = message.c_str();
-    getLogger().info("%s", logMessage);
-
-
-    std::vector<std::string> parts;
-    std::string part;
-    std::istringstream f(message);
-    while (std::getline(f, part, '`')) {
-        parts.push_back(part);
-    }
-
-    AddSongObject(parts[0], parts[1], parts[2]);
-}
-
-void ConnectWebSocket() {
-    std::string webSocketUrl = "ws://" + getModConfig().ServerAddress.GetValue() + ":" + getModConfig().ServerPort.GetValue();
-
-    getLogger().info("Connecting to %s", webSocketUrl.c_str());
-    try {
-        ws = WebSocket::from_url(webSocketUrl);
-    } catch (std::exception &e) {
-        getLogger().error("Error connecting to websocket: %s", e.what());
-        connectionStatus = 0;
-        return;
-    }
-    assert(ws);
-    connectionStatus = 1;
-
-    while (ws->getReadyState() != WebSocket::CLOSED) {
-        ws->poll();
-        ws->dispatch(handle_message);
-    }
-
-    connectionStatus = 0;
-}
-
 // Called at the early stages of game loading
 extern "C" void setup(ModInfo& info) {
     info.id = MOD_ID;
@@ -128,21 +69,187 @@ extern "C" void setup(ModInfo& info) {
     modInfo = info;
 	
     getConfig().Load();
+
+    getModConfig().Init(modInfo);
+
     getLogger().info("Completed setup!");
 }
+
+std::vector<std::string> requestedSongs;
+
+void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
+    std::string username = ircMessage.prefix.nick;
+    std::string message = ircMessage.parameters.at(ircMessage.parameters.size() - 1);
+    if(!message.starts_with("!bsr")) return;
+    if(message.length() < 6) return;
+    std::string code = message.substr(5);
+
+    if (!menuInitialized) return;
+
+    if(std::find(requestedSongs.begin(), requestedSongs.end(), code) != requestedSongs.end()) return;
+
+    QuestUI::MainThreadScheduler::Schedule([code]{
+        BeatSaver::API::GetBeatmapByKeyAsync(code, [code](std::optional<BeatSaver::Beatmap> beatmap) {
+            if (beatmap.has_value()) {
+                getLogger().info("Found beatmap %s on BeatSaver", beatmap.value().GetName().c_str());
+
+                TSRQ::SongListObject* songListObject = new TSRQ::SongListObject;
+                songListObject->setSong(beatmap);
+
+                TSRQ::FloatingMenu::get_instance()->push(songListObject);
+
+                requestedSongs.push_back(code);
+
+                getLogger().info("pushed song %s", code.c_str());
+            }else {
+                getLogger().info("Song with key %s not found", code.c_str());
+            }
+        });
+
+    });
+
+
+}
+
+#define JOIN_RETRY_DELAY 3000
+#define CONNECT_RETRY_DELAY 15000
+
+void TwitchIRCThread() {
+    if(threadRunning)
+        return;
+    threadRunning = true;
+    getLogger().info("Thread Started!");
+    TwitchIRCClient client = TwitchIRCClient();
+    std::string currentChannel = "";
+    using namespace std::chrono;
+    milliseconds lastJoinTry = 0ms;
+    milliseconds lastConnectTry = 0ms;
+    bool wasConnected = false;
+    while(threadRunning) {
+        auto currentTime = duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch());
+        if(client.Connected()) {
+            std::string targetChannel = getModConfig().Channel.GetValue();
+            if(currentChannel != targetChannel) {
+                if ((currentTime - lastJoinTry).count() > JOIN_RETRY_DELAY) {
+                    lastJoinTry = currentTime;
+                    if(client.JoinChannel(targetChannel)) {
+                        currentChannel = targetChannel;
+                        getLogger().info("Twitch Chat: Joined Channel %s!", currentChannel.c_str());
+                    }
+                }
+            }
+            client.ReceiveData();
+        } else {
+            if(wasConnected) {
+                wasConnected = false;
+                getLogger().info("Twitch Chat: Disconnected!");
+            }
+            if ((currentTime - lastConnectTry).count() > CONNECT_RETRY_DELAY) {
+                getLogger().info("Twitch Chat: Connecting...");
+                lastConnectTry = currentTime;
+                if (client.InitSocket()) {
+                    if (client.Connect()) {
+                        if (client.Login("justinfan" + std::to_string(1030307 + rand() % 1030307), "xxx")) {
+                            wasConnected = true;
+                            getLogger().info("Twitch Chat: Logged In!");
+                            client.HookIRCCommand("PRIVMSG", OnChatMessage);
+                            currentChannel = "";
+                        }
+                    }
+                }
+            }
+        }
+        std::this_thread::yield();
+    }
+    if(wasConnected) {
+        wasConnected = false;
+        getLogger().info("Twitch Chat: Disconnected!");
+    }
+    threadRunning = false;
+    client.Disconnect();
+    getLogger().info("Thread Stopped!");
+}
+
+MAKE_HOOK_MATCH(SceneManager_Internal_ActiveSceneChanged,
+                &UnityEngine::SceneManagement::SceneManager::Internal_ActiveSceneChanged,
+                void, UnityEngine::SceneManagement::Scene prevScene, UnityEngine::SceneManagement::Scene nextScene) {
+    SceneManager_Internal_ActiveSceneChanged(prevScene, nextScene);
+    if(nextScene.IsValid()) {
+        std::string sceneName = to_utf8(csstrtostr(nextScene.get_name()));
+        if(sceneName.find("Menu") != std::string::npos) {
+            QuestUI::MainThreadScheduler::Schedule(
+                    [] {
+                        if (!threadRunning)
+                            std::thread (TwitchIRCThread).detach();
+                    }
+            );
+        }
+    }
+}
+
+/*MAKE_HOOK_MATCH(LevelSelectionNavigationControllerDidActivate, &GlobalNamespace::LevelSelectionNavigationController::DidActivate, void, GlobalNamespace::LevelSelectionNavigationController *self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+
+    LevelSelectionNavigationControllerDidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+
+    getLogger().info("Creating Menu");
+
+    if (firstActivation) TSRQ::FloatingMenu::get_instance()->Initialize();
+
+
+
+    if (firstActivation) {
+        menu = QuestUI::BeatSaberUI::CreateFloatingScreen(UnityEngine::Vector2(60, 150), UnityEngine::Vector3(0, 0, 0), UnityEngine::Vector3(0, 0, 0), 1.0f, true, true, 4);
+
+        QuestUI::BeatSaberUI::AddHoverHint(menu->get_transform()->get_gameObject(), "Move by Pressing a trigger");
+
+
+
+
+        getLogger().info("Created menu");
+        return;
+    }
+
+    if (menu) {
+        menu->get_gameObject()->set_active(true);
+    }
+}
+
+MAKE_HOOK_MATCH(LevelSelectionNavigationControllerDidDeactivate, &GlobalNamespace::LevelSelectionNavigationController::DidDeactivate, void, GlobalNamespace::LevelSelectionNavigationController *self, bool removedFromHierarchy, bool screenSystemDisabling) {
+
+    LevelSelectionNavigationControllerDidDeactivate(self, removedFromHierarchy, screenSystemDisabling);
+
+    if (menu) {
+        menu->get_gameObject()->set_active(false);
+    }
+}*/
+
+MAKE_HOOK_MATCH(MainMenuViewControllerDidActivate, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController *self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    MainMenuViewControllerDidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+
+    if (firstActivation) {
+        TSRQ::FloatingMenu::get_instance()->Initialize();
+        menuInitialized = true;
+    }
+}
+
+
 
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
     il2cpp_functions::Init();
     QuestUI::Init();
-    getModConfig().Init(modInfo);
+    ::BSML::Init();
+    ::custom_types::Register::AutoRegister();
+    ::Lapiz::Attributes::AutoRegister();
 
+    songDetails = SongDetailsCache::SongDetails::Init();
+
+    // Register settings menu
     QuestUI::Register::RegisterModSettingsViewController(modInfo, DidActivate);
+    QuestUI::Register::RegisterMainMenuModSettingsViewController(modInfo, DidActivate);
 
     getLogger().info("Installing hooks...");
     INSTALL_HOOK(getLogger(), SceneManager_Internal_ActiveSceneChanged);
+    INSTALL_HOOK(getLogger(), MainMenuViewControllerDidActivate);
     getLogger().info("Installed all hooks!");
-
-    // start the websocket connection, dont crash if it fails
-    std::thread (ConnectWebSocket).detach();
 }
