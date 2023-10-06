@@ -3,7 +3,7 @@
         <text text='Song Requests' align='Center' italics='true'/>
     </horizontal>
     <horizontal preferred-height='72' pad-top='0' pad-bottom='2' preferred-width='80'>
-        <vertical preferred-width='70'>
+        <vertical preferred-width='70' pad-top="3" pad-bottom="10">
             <list id='songTableData' select-cell='SelectSong' visible-cells='9' show-scrollbar='true' />
         </vertical>
     </horizontal>

@@ -27,7 +27,7 @@ void TSRQ::FloatingMenu::Initialize() {
 
 
 
-    menu = QuestUI::BeatSaberUI::CreateFloatingScreen(UnityEngine::Vector2(80.0f, 72.0f), UnityEngine::Vector3(0, 4.0f, 0), UnityEngine::Vector3(0, 0, 0), 0.0f, true, true, 3);
+    menu = QuestUI::BeatSaberUI::CreateFloatingScreen(UnityEngine::Vector2(80.0f, 72.0f), UnityEngine::Vector3(-2.0f, 3.6f, 3.5f), UnityEngine::Vector3(-36.0f, -34.0f, 0.0f), 0.0f, true, true, 3);
     BSML::parse_and_construct(IncludedAssets::menu_bsml, menu->get_transform(), this);
     
     // QuestUI::BeatSaberUI::AddHoverHint(menu->get_transform()->get_gameObject(), "Move by Pressing a trigger");
@@ -121,7 +121,7 @@ void TSRQ::FloatingMenu::SelectSong(HMUI::TableView *table, int id)
     songList[id]->downloading = true;
     this->RefreshTable();
 
-    songList[id]->song->DownloadLatestBeatmapAsync([id, this](bool finished){
+    /*songList[id]->song->DownloadLatestBeatmapAsync([id, this](bool finished){
         if (finished) {
             songList[id]->setIsDownloaded(true);
             songList[id]->setIsDownloading(false);
@@ -129,6 +129,20 @@ void TSRQ::FloatingMenu::SelectSong(HMUI::TableView *table, int id)
         }
     }, [id](float progress){
 
+    });*/
+
+    BeatSaver::API::DownloadBeatmapAsync(songList[id]->song.value(), [id, this](bool finished){
+        songList[id]->setIsDownloaded(true);
+        songList[id]->setIsDownloading(false);
+        this->RefreshTable();
+
+        QuestUI::MainThreadScheduler::Schedule(
+                [this]
+                {
+                    RuntimeSongLoader::API::RefreshSongs();
+                });
+
+    }, [id](float progress){
     });
 }
 

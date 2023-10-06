@@ -26,6 +26,7 @@
 #include "lapiz/shared/AttributeRegistration.hpp"
 
 #include "GlobalNamespace/LevelSelectionNavigationController.hpp"
+#include "GlobalNamespace/MainMenuViewController.hpp"
 
 #include "songdownloader/shared/BeatSaverAPI.hpp"
 
@@ -41,6 +42,8 @@
 
 bool threadRunning = false;
 static UnityEngine::GameObject *menu;
+
+bool menuInitialized = false;
 
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
@@ -80,6 +83,8 @@ void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient* client) {
     if(!message.starts_with("!bsr")) return;
     if(message.length() < 6) return;
     std::string code = message.substr(5);
+
+    if (!menuInitialized) return;
 
     if(std::find(requestedSongs.begin(), requestedSongs.end(), code) != requestedSongs.end()) return;
 
@@ -182,7 +187,7 @@ MAKE_HOOK_MATCH(SceneManager_Internal_ActiveSceneChanged,
     }
 }
 
-MAKE_HOOK_MATCH(LevelSelectionNavigationControllerDidActivate, &GlobalNamespace::LevelSelectionNavigationController::DidActivate, void, GlobalNamespace::LevelSelectionNavigationController *self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+/*MAKE_HOOK_MATCH(LevelSelectionNavigationControllerDidActivate, &GlobalNamespace::LevelSelectionNavigationController::DidActivate, void, GlobalNamespace::LevelSelectionNavigationController *self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
 
     LevelSelectionNavigationControllerDidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
@@ -192,7 +197,7 @@ MAKE_HOOK_MATCH(LevelSelectionNavigationControllerDidActivate, &GlobalNamespace:
 
 
 
-    /*if (firstActivation) {
+    if (firstActivation) {
         menu = QuestUI::BeatSaberUI::CreateFloatingScreen(UnityEngine::Vector2(60, 150), UnityEngine::Vector3(0, 0, 0), UnityEngine::Vector3(0, 0, 0), 1.0f, true, true, 4);
 
         QuestUI::BeatSaberUI::AddHoverHint(menu->get_transform()->get_gameObject(), "Move by Pressing a trigger");
@@ -206,7 +211,7 @@ MAKE_HOOK_MATCH(LevelSelectionNavigationControllerDidActivate, &GlobalNamespace:
 
     if (menu) {
         menu->get_gameObject()->set_active(true);
-    }*/
+    }
 }
 
 MAKE_HOOK_MATCH(LevelSelectionNavigationControllerDidDeactivate, &GlobalNamespace::LevelSelectionNavigationController::DidDeactivate, void, GlobalNamespace::LevelSelectionNavigationController *self, bool removedFromHierarchy, bool screenSystemDisabling) {
@@ -215,6 +220,15 @@ MAKE_HOOK_MATCH(LevelSelectionNavigationControllerDidDeactivate, &GlobalNamespac
 
     if (menu) {
         menu->get_gameObject()->set_active(false);
+    }
+}*/
+
+MAKE_HOOK_MATCH(MainMenuViewControllerDidActivate, &GlobalNamespace::MainMenuViewController::DidActivate, void, GlobalNamespace::MainMenuViewController *self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    MainMenuViewControllerDidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+
+    if (firstActivation) {
+        TSRQ::FloatingMenu::get_instance()->Initialize();
+        menuInitialized = true;
     }
 }
 
@@ -236,7 +250,6 @@ extern "C" void load() {
 
     getLogger().info("Installing hooks...");
     INSTALL_HOOK(getLogger(), SceneManager_Internal_ActiveSceneChanged);
-    INSTALL_HOOK(getLogger(), LevelSelectionNavigationControllerDidActivate);
-    INSTALL_HOOK(getLogger(), LevelSelectionNavigationControllerDidDeactivate);
+    INSTALL_HOOK(getLogger(), MainMenuViewControllerDidActivate);
     getLogger().info("Installed all hooks!");
 }

@@ -22,6 +22,9 @@
 
 #define GET_FIND_METHOD(mPtr) il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::get()
 
+namespace TSRQ {
+    class SongListObject;
+}
 
 DECLARE_CLASS_CODEGEN(TSRQ, CustomSongListTableCell, HMUI::TableCell,
     DECLARE_OVERRIDE_METHOD(void, SelectionDidChange, GET_FIND_METHOD(&HMUI::SelectableCell::SelectionDidChange), HMUI::SelectableCell::TransitionType transitionType);
@@ -35,7 +38,7 @@ DECLARE_CLASS_CODEGEN(TSRQ, CustomSongListTableCell, HMUI::TableCell,
 
 public:
     // Song entry to have a reference to the song data
-    TSRQ::SongListObject entry;
+    TSRQ::SongListObject* entry;
     CustomSongListTableCell* PopulateWithSongData(TSRQ::SongListObject* songListObject);
     // void UpdateProgress();
     // void RefreshBar();

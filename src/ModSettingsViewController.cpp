@@ -28,5 +28,12 @@ void DidActivate(ViewController* self, bool firstActivation, bool addedToHierarc
         BeatSaberUI::AddHoverHint(underscoreButton->get_gameObject(), "Adds a underscore");
         LayoutElement* layoutElement = underscoreButton->GetComponent<LayoutElement*>();
         layoutElement->set_minWidth(4.0f);
+
+        auto layout2 = BeatSaberUI::CreateVerticalLayoutGroup(parent);
+        layout2->GetComponent<LayoutElement*>()->set_preferredWidth(90.0f);
+        layout2->set_childControlWidth(true);
+        auto layoutParent2 = layout2->get_transform();
+        auto text = BeatSaberUI::CreateText(layoutParent2, "Please enter your Twitch Name above\n\nNote: This Mod is still in a Beta state.\nPlease Report any Bugs you may encounter in the issues tab of the\ngithub repo");
+
     }
 }
