@@ -124,6 +124,8 @@ void TSRQ::FloatingMenu::SelectSong(HMUI::TableView *table, int id)
 {
     getLogger().info("TSRQ: Cell is clicked");
 
+    this->songListTable()->ClearSelection();
+
     if (NumberOfCells() <= id) {
         getLogger().info("How did you even click a non existent cell!!!???!!!??");
     }
