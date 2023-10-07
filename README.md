@@ -15,6 +15,8 @@ Let your viewers suggest maps using the !bsr command. Beatmaps can be found on [
 - Request History
 - Download all Maps button
 
+Check out all currently planned features on [Trello](https://trello.com/b/FX4fhDiU/todo)
+
 
 ## Credits
 
