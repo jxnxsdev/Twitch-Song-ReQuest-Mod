@@ -10,12 +10,21 @@
 #include "GlobalNamespace/LevelCollectionTableView.hpp"
 #include "assets.hpp"
 #include "SongListObject.hpp"
+#include "GlobalNamespace/SelectLevelCategoryViewController.hpp"
 #include "songloader/shared/API.hpp"
+#include "HMUI/NoTransitionsButton.hpp"
+#include "GlobalNamespace/LevelSelectionNavigationController.hpp"
+#include "GlobalNamespace/LevelCollectionNavigationController.hpp"
+#include "GlobalNamespace/LevelCollectionViewController.hpp"
+#include "songdownloader/shared/BeatSaverAPI.hpp"
+
 #define coro(coroutine) GlobalNamespace::SharedCoroutineStarter::get_instance()->StartCoroutine(custom_types::Helpers::CoroutineHelper::New(coroutine))
 #include "main.hpp"
 DEFINE_TYPE(TSRQ, FloatingMenu);
 
 SafePtrUnity<TSRQ::FloatingMenu> TSRQ::FloatingMenu::instance;
+
+using namespace GlobalNamespace;
 
 // Runs on creation
 void TSRQ::FloatingMenu::ctor() {
@@ -27,7 +36,7 @@ void TSRQ::FloatingMenu::Initialize() {
 
 
 
-    menu = QuestUI::BeatSaberUI::CreateFloatingScreen(UnityEngine::Vector2(80.0f, 72.0f), UnityEngine::Vector3(-2.0f, 3.6f, 3.5f), UnityEngine::Vector3(-36.0f, -34.0f, 0.0f), 0.0f, true, true, 3);
+    menu = QuestUI::BeatSaberUI::CreateFloatingScreen(UnityEngine::Vector2(80.0f, 76.0f), UnityEngine::Vector3(-2.0f, 3.6f, 3.5f), UnityEngine::Vector3(-36.0f, -34.0f, 0.0f), 0.0f, true, true, 3);
     BSML::parse_and_construct(IncludedAssets::menu_bsml, menu->get_transform(), this);
     
     // QuestUI::BeatSaberUI::AddHoverHint(menu->get_transform()->get_gameObject(), "Move by Pressing a trigger");
@@ -38,8 +47,13 @@ void TSRQ::FloatingMenu::Initialize() {
         getLogger().info("TSRQ: SongTable Data Initialized");
     }
     
-    this->PostParse();
+    // this->PostParse(); no need to call it
     this->RefreshTable();
+
+    // Get coordinators
+    soloFreePlayFlowCoordinator = UnityEngine::Object::FindObjectOfType<SoloFreePlayFlowCoordinator*>();
+    multiplayerLevelSelectionFlowCoordinator = UnityEngine::Object::FindObjectOfType<MultiplayerLevelSelectionFlowCoordinator*>();
+
     initialized = true;
 }
 
@@ -115,6 +129,29 @@ void TSRQ::FloatingMenu::SelectSong(HMUI::TableView *table, int id)
     }
 
     if(songList[id]->downloading == true || songList[id]->isDownloaded == true) {
+        if (songList[id]->isDownloaded == true) {
+
+            BeatSaver::Beatmap songToPlay = songList[id]->song.value();
+            
+            QuestUI::MainThreadScheduler::Schedule(
+            [this, songToPlay]
+            {
+                auto& beatmap = songToPlay.GetVersions().front();
+                std::string mapHash = beatmap.GetHash();
+                auto level = RuntimeSongLoader::API::GetLevelByHash(mapHash);
+                if(level.has_value())
+                {
+                    auto currentLevel = reinterpret_cast<IPreviewBeatmapLevel*>(level.value());
+                    EnterSolo(currentLevel);
+                } else {
+                    getLogger().info("TSRQ: level is empty");
+                    return;
+                }
+            });
+
+          
+        }
+
         return;
     }
 
@@ -132,19 +169,81 @@ void TSRQ::FloatingMenu::SelectSong(HMUI::TableView *table, int id)
     });*/
 
     BeatSaver::API::DownloadBeatmapAsync(songList[id]->song.value(), [id, this](bool finished){
-        songList[id]->setIsDownloaded(true);
         songList[id]->setIsDownloading(false);
         this->RefreshTable();
 
         QuestUI::MainThreadScheduler::Schedule(
-                [this]
-                {
-                    RuntimeSongLoader::API::RefreshSongs();
-                });
+            [this, id]
+            {
+                RuntimeSongLoader::API::RefreshSongs(false,
+                    [this, id](std::vector<CustomPreviewBeatmapLevel*> const&){
+                        QuestUI::MainThreadScheduler::Schedule(
+                            [this, id] {
+                                songList[id]->setIsDownloaded(true);
+                                this->RefreshTable();
+                            }
+                        );
+                    }
+                );
+            }
+        );
 
     }, [id](float progress){
     });
 }
+
+void TSRQ::FloatingMenu::GoToSongSelect() {
+    SafePtrUnity<UnityEngine::GameObject> songSelectButton = UnityEngine::GameObject::Find(il2cpp_utils::newcsstr("SoloButton"));
+    if (!songSelectButton) {
+        songSelectButton = UnityEngine::GameObject::Find(il2cpp_utils::newcsstr("Wrapper/BeatmapWithModifiers/BeatmapSelection/EditButton"));
+    }
+    if (!songSelectButton) {
+        return;
+    }
+    songSelectButton->GetComponent<HMUI::NoTransitionsButton *>()->Press();
+}
+
+// !Run in the main thread
+void TSRQ::FloatingMenu::EnterSolo(IPreviewBeatmapLevel* level) {
+    // fcInstance->Close(true, false);
+    
+    
+    // If we are in the song selection screen, we can just select the song
+    SafePtrUnity<GlobalNamespace::LevelCollectionNavigationController> levelCollectionNavigationController = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelCollectionNavigationController*>().FirstOrDefault();
+    if(levelCollectionNavigationController ) {
+        getLogger().info("TSRQ: levelCollectionNavigationController is not null");
+        if (levelCollectionNavigationController->get_isActiveAndEnabled()) {
+            getLogger().info("TSRQ: levelCollectionNavigationController is active and enabled");
+            // levelCollectionNavigationController->Selectp(level);
+
+            // FIXME: Level selection does not reselect the level if it is already selected 
+            levelCollectionNavigationController->SelectLevel(level);
+            return;
+        }
+        
+    }
+
+    auto customLevelsPack = RuntimeSongLoader::API::GetCustomLevelsPack();
+    auto category = SelectLevelCategoryViewController::LevelCategory(SelectLevelCategoryViewController::LevelCategory::All);
+    
+    auto state = LevelSelectionFlowCoordinator::State::New_ctor(
+        System::Nullable_1(category, true),
+        (IBeatmapLevelPack*) customLevelsPack->CustomLevelsPack ,
+        level,
+        nullptr
+    );
+
+    multiplayerLevelSelectionFlowCoordinator->LevelSelectionFlowCoordinator::Setup(state);
+    soloFreePlayFlowCoordinator->Setup(state);
+
+    GoToSongSelect();
+
+    
+
+    // For some reason setup does not work for multiplayer so I have to use this method to workaround
+    multiplayerLevelSelectionFlowCoordinator->levelSelectionNavigationController->levelCollectionNavigationController->SelectLevel(level);
+}
+
 
 void TSRQ::FloatingMenu::push(TSRQ::SongListObject* songListObject)
 {
