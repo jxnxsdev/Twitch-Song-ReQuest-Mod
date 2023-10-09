@@ -39,7 +39,6 @@
 #include <sstream>
 #include <chrono>
 
-
 bool threadRunning = false;
 static UnityEngine::GameObject *menu;
 
