@@ -232,8 +232,6 @@ MAKE_HOOK_MATCH(MainMenuViewControllerDidActivate, &GlobalNamespace::MainMenuVie
     }
 }
 
-
-
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
     il2cpp_functions::Init();
