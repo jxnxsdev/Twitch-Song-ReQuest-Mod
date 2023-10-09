@@ -1,7 +1,7 @@
 name: Build
 
 env:
-  module_id: twitchsongrequest
+  module_id: TwitchSongReQuest
   qmodName: TwitchSongReQuest
 
 on:
