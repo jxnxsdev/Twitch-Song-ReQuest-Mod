@@ -1,5 +1,7 @@
 # TwitchSongReQuest
 
+![https://github.com/hdgamer1404Jonas/Twitch-Song-ReQuest-Mod/blob/main/cover.png?raw=true]
+
 Let your viewers suggest maps using the !bsr command. Beatmaps can be found on [BeatSaver](https://beatsaver.com) and codes directly copied by pressing the Twitch Icon.
 
 **Note:** This mod may still contain some bugs. Please report them in the issues Module of this repository.
