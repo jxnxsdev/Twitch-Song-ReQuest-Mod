@@ -31,7 +31,7 @@ jobs:
       - name: QPM Action
         uses: Fernthedev/qpm-action@main
         with:
-          workflow_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow_token: ${{ secrets.TOKEN }}
 
           restore: true
           cache: true
@@ -96,4 +96,4 @@ jobs:
             ./build/debug/debug_${{ steps.libname.outputs.NAME }}
             ./${{ env.qmodName }}.qmod
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
