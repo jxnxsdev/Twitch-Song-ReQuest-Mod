@@ -48,7 +48,7 @@ jobs:
       - name: Build
         run: |
           cd ${GITHUB_WORKSPACE}
-          pwsh -Command ./build.ps1
+          pwsh -Command ./scripts/build.ps1
 
       - name: Get Library Name
         id: libname
@@ -82,7 +82,7 @@ jobs:
       - name: Create qmod
         if: github.event_name != 'pull_request' && steps.commit-regex.outputs.match != ''
         run: |
-          pwsh -Command ./createqmod.ps1 ${{env.qmodName}}
+          pwsh -Command ./scripts/createqmod.ps1 ${{env.qmodName}}
 
       - name: Upload to Release
         id: upload_file_release
