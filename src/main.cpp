@@ -184,7 +184,6 @@ MAKE_HOOK_MATCH(SceneManager_Internal_ActiveSceneChanged,
         }
     }
 }
-
 /*MAKE_HOOK_MATCH(LevelSelectionNavigationControllerDidActivate, &GlobalNamespace::LevelSelectionNavigationController::DidActivate, void, GlobalNamespace::LevelSelectionNavigationController *self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
 
     LevelSelectionNavigationControllerDidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
