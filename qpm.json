@@ -72,13 +72,13 @@
       "additionalData": {}
     },
     {
-      "id": "config-utils",
-      "versionRange": "^1.1.0",
+      "id": "songdownloader",
+      "versionRange": "^0.5.6",
       "additionalData": {}
     },
     {
-      "id": "songdownloader",
-      "versionRange": "^0.6.0",
+      "id": "config-utils",
+      "versionRange": "^0.8.0",
       "additionalData": {}
     }
   ],
