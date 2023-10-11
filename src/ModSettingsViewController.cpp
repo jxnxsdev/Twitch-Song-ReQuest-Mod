@@ -20,7 +20,7 @@ void DidActivate(ViewController* self, bool firstActivation, bool addedToHierarc
         layout->GetComponent<LayoutElement*>()->set_preferredWidth(90.0f);
         layout->set_childControlWidth(true);
         auto layoutParent = layout->get_transform();
-        auto stringSetting = AddConfigValueInputString(layoutParent, getModConfig().Channel);
+        auto stringSetting = AddConfigValueStringSetting(layoutParent, getModConfig().Channel);
         auto underscoreButton = BeatSaberUI::CreateUIButton(layoutParent, "", UnityEngine::Vector2(0.0f, 0.0f), UnityEngine::Vector2(4.0f, 8.0f), [stringSetting] {
             stringSetting->KeyboardKeyPressed('_');
             stringSetting->UpdateClearButton();

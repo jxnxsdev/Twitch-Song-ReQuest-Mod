@@ -68,7 +68,6 @@ extern "C" void setup(ModInfo& info) {
     modInfo = info;
 	
     getConfig().Load();
-
     getModConfig().Init(modInfo);
 
     getLogger().info("Completed setup!");

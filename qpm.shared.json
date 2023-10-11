@@ -73,13 +73,13 @@
         "additionalData": {}
       },
       {
-        "id": "config-utils",
-        "versionRange": "^1.1.0",
+        "id": "songdownloader",
+        "versionRange": "^0.5.6",
         "additionalData": {}
       },
       {
-        "id": "songdownloader",
-        "versionRange": "^0.6.0",
+        "id": "config-utils",
+        "versionRange": "^0.8.0",
         "additionalData": {}
       }
     ],
@@ -128,13 +128,13 @@
     {
       "dependency": {
         "id": "rapidjson-macros",
-        "versionRange": "=1.0.0",
+        "versionRange": "=0.3.0",
         "additionalData": {
           "headersOnly": true,
-          "branchName": "version-v1.0.0"
+          "branchName": "version-v0.3.0"
         }
       },
-      "version": "1.0.0"
+      "version": "0.3.0"
     },
     {
       "dependency": {
@@ -247,15 +247,16 @@
     {
       "dependency": {
         "id": "config-utils",
-        "versionRange": "=1.1.0",
+        "versionRange": "=0.8.0",
         "additionalData": {
           "headersOnly": true,
-          "soLink": "https://github.com/darknight1050/config-utils/releases/download/v1.1.0/libconfig-utils_test.so",
+          "soLink": "https://github.com/darknight1050/config-utils/releases/download/v0.8.0/libconfig-utils_test.so",
+          "debugSoLink": "https://github.com/darknight1050/config-utils/releases/download/v0.8.0/debug_libconfig-utils_test.so",
           "overrideSoName": "libconfig-utils_test.so",
-          "branchName": "version/v1_1_0"
+          "branchName": "version-v0.8.0"
         }
       },
-      "version": "1.1.0"
+      "version": "0.8.0"
     },
     {
       "dependency": {
@@ -302,15 +303,16 @@
     {
       "dependency": {
         "id": "songdownloader",
-        "versionRange": "=0.6.0",
+        "versionRange": "=0.5.6",
         "additionalData": {
-          "soLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.6.0/libsongdownloader.so",
+          "soLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.5.6/libsongdownloader.so",
+          "debugSoLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.5.6/debug_libsongdownloader.so",
           "overrideSoName": "libsongdownloader.so",
-          "modLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.6.0/SongDownloader.qmod",
-          "branchName": "version/v0_6_0"
+          "modLink": "https://github.com/darknight1050/SongDownloader/releases/download/v0.5.6/SongDownloader.qmod",
+          "branchName": "version-v0.5.6"
         }
       },
-      "version": "0.6.0"
+      "version": "0.5.6"
     },
     {
       "dependency": {
