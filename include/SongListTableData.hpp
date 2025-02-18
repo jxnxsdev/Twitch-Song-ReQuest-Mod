@@ -5,6 +5,7 @@
 #include "HMUI/Touchable.hpp"
 #include "bsml/shared/BSML.hpp"
 
+#include "logging.hpp"
 #include "main.hpp"
 #include "assets.hpp"
 
@@ -21,17 +22,17 @@ namespace TSRQ
             
             if (!tableCell)
             {   
-                tableCell = UnityEngine::GameObject::New_ctor("CustomSongListTableCell", csTypeOf(HMUI::Touchable *))->AddComponent<CustomSongListTableCell *>();
+                tableCell = UnityEngine::GameObject::New_ctor("CustomSongListTableCell")->AddComponent<CustomSongListTableCell *>();
                 tableCell->set_interactable(true);
                 tableCell->set_reuseIdentifier(ReuseIdentifier);
                 BSML::parse_and_construct(IncludedAssets::songItem_bsml, tableCell->get_transform(), tableCell);
                 
                 // Weird hack cause HMUI touchable is not there for some reason
                 tableCell->get_gameObject()->AddComponent<HMUI::Touchable *>();
-                getLogger().info("TSRQ: SongListCell Initialized");
+                INFO("TSRQ: SongListCell Initialized");
             }
 
-            return reinterpret_cast<CustomSongListTableCell *>(tableCell);
+            return tableCell.cast<CustomSongListTableCell>();
         }
     };
 }

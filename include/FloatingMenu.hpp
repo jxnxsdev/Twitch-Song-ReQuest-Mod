@@ -4,22 +4,17 @@
 #include "bsml/shared/macros.hpp"
 #include "bsml/shared/BSML.hpp"
 #include "bsml/shared/BSML/Components/CustomListTableData.hpp"
-#include "HMUI/TableView_IDataSource.hpp"
+#include "HMUI/TableView.hpp"
 #include "HMUI/ViewController.hpp"
 #include "HMUI/TableView.hpp"
 #include "HMUI/TableCell.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
 #include "UnityEngine/GameObject.hpp"
-#include "main.hpp"
-#include "songdownloader/shared/BeatSaverAPI.hpp"
 #include "SongListObject.hpp"
 #include "GlobalNamespace/SoloFreePlayFlowCoordinator.hpp"
 #include "GlobalNamespace/MultiplayerLevelSelectionFlowCoordinator.hpp"
 #include "GlobalNamespace/LevelSelectionFlowCoordinator.hpp"
-#include "GlobalNamespace/LevelSelectionFlowCoordinator_State.hpp"
-#include "GlobalNamespace/IPreviewBeatmapLevel.hpp"
-#include "GlobalNamespace/IDifficultyBeatmap.hpp"
-#include "songloader/shared/API.hpp"
+
 
 using namespace GlobalNamespace;
 
@@ -49,11 +44,9 @@ DECLARE_CLASS_CODEGEN_INTERFACES(TSRQ, FloatingMenu, UnityEngine::MonoBehaviour,
     public:
         HMUI::TableView* songListTable() {
             if(songTableData) {
-                getLogger().info("songTableData is not null");
                 return songTableData->tableView;
             }
             else {
-                getLogger().info("songTableData is null");
                 return nullptr;
             }
         }
@@ -63,7 +56,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(TSRQ, FloatingMenu, UnityEngine::MonoBehaviour,
         static void delete_instance();
         static SafePtrUnity<TSRQ::FloatingMenu> get_instance();
         void push(TSRQ::SongListObject* songListObject);
-        void EnterSolo(IPreviewBeatmapLevel* level);
+        void EnterSolo(GlobalNamespace::BeatmapLevel* level);
         // TODO: Figure out how to get this to work and not to have it being set in ctor
         float cellSize = 12.0f;
         std::vector<TSRQ::SongListObject*> songList;

@@ -15,13 +15,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         name: Checkout
         with:
           submodules: true
           lfs: true
 
-      - uses: seanmiddleditch/gha-setup-ninja@v3
+      - uses: seanmiddleditch/gha-setup-ninja@v5
 
       - name: Create ndkpath.txt
         run: |
@@ -29,9 +29,10 @@ jobs:
           cat ${GITHUB_WORKSPACE}/ndkpath.txt
 
       - name: QPM Action
-        uses: Fernthedev/qpm-action@main
+        uses: Fernthedev/qpm-action@v1
         with:
-          workflow_token: ${{ secrets.TOKEN }}
+          resolve_ndk: true
+          workflow_token: ${{secrets.GITHUB_TOKEN}}
 
           restore: true
           cache: true
@@ -59,7 +60,7 @@ jobs:
           echo ::set-output name=NAME::"${files[0]}"
 
       - name: Upload non-debug artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.libname.outputs.NAME }}
           path: ./build/${{ steps.libname.outputs.NAME }}
@@ -86,7 +87,7 @@ jobs:
 
       - name: Upload to Release
         id: upload_file_release
-        uses: softprops/action-gh-release@v0.1.12
+        uses: softprops/action-gh-release@v2
         if: github.event_name != 'pull_request' && steps.commit-regex.outputs.match != ''
         with:
           name: ${{ steps.commit-regex.outputs.group4 }}

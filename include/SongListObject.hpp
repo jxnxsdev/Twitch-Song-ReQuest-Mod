@@ -4,20 +4,19 @@
 #include "SongListCell.hpp"
 #include "HMUI/Touchable.hpp"
 #include "bsml/shared/BSML.hpp"
-#include "songdownloader/shared/BeatSaverAPI.hpp"
-
 #include "main.hpp"
 #include "assets.hpp"
+#include "beatsaverplusplus/shared/Models/Beatmap.hpp"
 
 namespace TSRQ
 {
     class SongListObject {
     public:
-        std::optional<BeatSaver::Beatmap> song;
+        std::optional<BeatSaver::Models::Beatmap> song;
         bool downloading = false;
         bool isDownloaded = false;
 
-        void setSong(std::optional<BeatSaver::Beatmap> song) {
+        void setSong(std::optional<BeatSaver::Models::Beatmap> song) {
             this->song = song;
         }
 

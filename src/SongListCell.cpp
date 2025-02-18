@@ -1,15 +1,13 @@
 #include "SongListCell.hpp"
 
 #include "UnityEngine/RectTransform.hpp"
-#include "songdownloader/shared/BeatSaverAPI.hpp"
-#include "songloader/shared/API.hpp"
 #include "main.hpp"
 
 DEFINE_TYPE(TSRQ, CustomSongListTableCell)
 namespace TSRQ {
     CustomSongListTableCell* CustomSongListTableCell::PopulateWithSongData(TSRQ::SongListObject* songListObject) {
 
-        std::optional<BeatSaver::Beatmap> song = songListObject->song;
+        std::optional<BeatSaver::Models::Beatmap> song = songListObject->song;
 
         songName->set_text(song.value().GetName());
         levelAuthorName->set_text(song.value().GetMetadata().GetLevelAuthorName());
