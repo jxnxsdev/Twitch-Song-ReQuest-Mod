@@ -37,7 +37,7 @@ bool menuInitialized = false;
 static std::future<SongDetailsCache::SongDetails*> songDetails;
 
 // Called at the early stages of game loading
-extern "C" void setup(CModInfo& info) {
+extern "C" __attribute__((visibility("default"))) void setup(CModInfo& info) {
     info.id = MOD_ID;
     info.version = VERSION;
     modInfo.assign(info);
@@ -173,7 +173,7 @@ MAKE_HOOK_MATCH(MainMenuViewControllerDidActivate, &GlobalNamespace::MainMenuVie
 }
 
 // Called later on in the game loading - a good time to install function hooks
-extern "C" void load() {
+extern "C" __attribute__((visibility("default"))) void late_load() {
     il2cpp_functions::Init();
     BSML::Init();
     custom_types::Register::AutoRegister();

@@ -27,7 +27,8 @@ set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(INCLUDE_TWITCHIRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/TwitchIRC)
 
 # compile options used
-add_compile_options(-frtti -fexceptions)
+add_link_options(-Wl,--exclude-libs,ALL)
+add_compile_options(-frtti -fPIE -fPIC -fexceptions -fvisibility=hidden)
 add_compile_options(-O3)
 
 execute_process(COMMAND git config user.name OUTPUT_VARIABLE GIT_USER)
