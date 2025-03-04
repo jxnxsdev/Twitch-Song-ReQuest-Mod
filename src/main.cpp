@@ -74,7 +74,7 @@ void OnChatMessage(IRCMessage ircMessage, TwitchIRCClient *client) {
       int curlStatus = response.curlStatus;
 
       std::string message = "";
-      ///.... Process error here
+      // TODO.... Process error here
       return;
     }
 
